@@ -44,7 +44,7 @@ func main() {
 class: center, middle
 
 Code
-https://github.com/base-org/presentation-distributed-design-patterns
+https://github.com/AgarwalConsulting/presentation-distributed-design-patterns
 
 Slides
-https://distributed-design-patterns.slides.base-org.com
+https://distributed-design-patterns.slides.agarwalconsulting.com
