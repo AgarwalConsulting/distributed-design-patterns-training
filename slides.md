@@ -6,7 +6,7 @@ layout: true
 
 class: center, middle
 
-# {title}
+# Distributed Design Patterns
 
 Gaurav Agarwal
 
@@ -44,7 +44,7 @@ func main() {
 class: center, middle
 
 Code
-https://github.com/base-org/presentation-template
+https://github.com/base-org/presentation-distributed-design-patterns
 
 Slides
-https://template.slides.base-org.com
+https://distributed-design-patterns.slides.base-org.com
