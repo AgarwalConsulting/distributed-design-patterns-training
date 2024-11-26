@@ -391,7 +391,35 @@ Microservices interact with each other primarily through:
 - **Asynchronous communication**: Using message brokers like RabbitMQ, Apache Kafka, or Amazon SQS.
 
 ---
+class: center, middle
 
+## Communication in a Client/Server Application
+
+---
+class: center, middle
+
+A client/server application is a distributed system where the application is divided into two main components: the client and the server.
+
+---
+class: center, middle
+
+The client initiates requests, and the server processes those requests and provides responses. This model separates the user interface and user interactions (client-side) from the data storage and processing (server-side), making it a fundamental architecture for many modern applications.
+
+---
+class: center, middle
+
+Generally, implemented over the internet (or intranet)
+
+---
+class: center, middle
+
+### OSI Layers
+
+![OSI Layers](assets/images/osi-layers.png)
+
+.image-credits[https://www.bmc.com/blogs/osi-model-7-layers/]
+
+---
 class: center, middle
 
 Code
