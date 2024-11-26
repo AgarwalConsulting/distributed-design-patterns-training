@@ -14,7 +14,7 @@ Gaurav Agarwal
 
 # Agenda
 
-- Distributed Systems are an *Engineering Marvel*`*`
+- Distributed Systems are an *Engineering Marvel* <sup>`*`</sup>
 
 .caveat[`*` *when done right*]
 
@@ -74,7 +74,7 @@ Here you are trying to *learn* something, while here your *brain* is doing you a
 
 ---
 
-### Some tips
+### Some tips (1/2)
 
 - Slow down => stop & think
   - listen for the questions and answer
@@ -86,9 +86,11 @@ Here you are trying to *learn* something, while here your *brain* is doing you a
 
 - Drink water. Lots of it!
 
+.caveat[continued...]
+
 ---
 
-### Some tips (continued)
+### Some tips (2/2)
 
 - Take notes
   - Try: *Repetitive Spaced Out Learning*
@@ -98,6 +100,8 @@ Here you are trying to *learn* something, while here your *brain* is doing you a
 - Listen to your brain
 
 - *Experiment!*
+
+.caveat[...continued]
 
 ---
 class: center, middle
@@ -200,67 +204,67 @@ They are all sharing the same database instance, with probable tight coupling be
 
 ---
 
-#### Key Characteristics of Monolithic Architecture:
+#### Key Characteristics of Monolithic Architecture
 
-1. **Unified Codebase**
+- **Unified Codebase**
 
-All functionalities are contained within a single codebase and are compiled together into a single executable or deployable unit.
+  All functionalities are contained within a single codebase and are compiled together into a single executable or deployable unit.
 
-2. **Tight Coupling**
+- **Tight Coupling**
 
-All components are interconnected and interdependent, making it difficult to change one component without affecting others.
+  All components are interconnected and interdependent, making it difficult to change one component without affecting others.
 
-3. **Single Deployment Unit**
+- **Single Deployment Unit**
 
-The entire application is deployed as a single artifact, such as a WAR, JAR, or executable file.
+  The entire application is deployed as a single artifact, such as a WAR, JAR, or executable file.
 
-4. **Shared Database**
+- **Shared Database**
 
-Typically uses a single, centralized database to manage data for the entire application.
+  Typically uses a single, centralized database to manage data for the entire application.
 
 ---
 
 #### Advantages of Monolithic Architecture
 
-1. **Simplicity**
+- **Simplicity**
 
-Easier to develop, test, and deploy for smaller applications.
+  Easier to develop, test, and deploy for smaller applications.
 
-2. **Performance**
+- **Performance**
 
-No inter-service communication overhead since everything runs in a single process.
+  No inter-service communication overhead since everything runs in a single process.
 
-3. **Straightforward Debugging**
+- **Straightforward Debugging**
 
-Debugging and logging are simpler because the application runs as a single entity.
+  Debugging and logging are simpler because the application runs as a single entity.
 
-4. **Development Tools**
+- **Development Tools**
 
-A wide variety of tools and frameworks are available to support monolithic architectures.
+  A wide variety of tools and frameworks are available to support monolithic architectures.
 
 ---
 
 #### Challenges with Monolithic Architecture
 
-1. **Scalability Challenges**
+- **Scalability Challenges**
 
-Difficult to scale individual components since the entire application must scale together.
+  Difficult to scale individual components since the entire application must scale together.
 
-2. **Reduced Agility**
+- **Reduced Agility**
 
-Harder to adopt new technologies or make changes without risking the entire system.
+  Harder to adopt new technologies or make changes without risking the entire system.
 
-3. **Slow Deployment**
+- **Slow Deployment**
 
-Even small updates require redeploying the entire application.
+  Even small updates require redeploying the entire application.
 
-4. **Complexity with Size**
+- **Complexity with Size**
 
-As the application grows, the codebase can become large and difficult to manage (the "monolith monster").
+  As the application grows, the codebase can become large and difficult to manage (the "monolith monster").
 
-5. **Reliability Issues**
+- **Reliability Issues**
 
-A failure in one component can bring down the entire application.
+  A failure in one component can bring down the entire application.
 
 ---
 class: center, middle
@@ -310,85 +314,96 @@ class: center, middle
 
 ---
 
-#### Key Characteristics of Microservices
+#### Key Characteristics of Microservices (1/2)
 
-1. **Single Responsibility**
+- **Single Responsibility**
 
-Each microservice is designed to perform a specific function or business capability (e.g., user management, payment processing).
+  Each microservice is designed to perform a specific function or business capability (e.g., user management, payment processing).
 
-2. **Independence**
+- **Independence**
 
-Services can be developed, deployed, and scaled independently without affecting other components of the application.
+  Services can be developed, deployed, and scaled independently without affecting other components of the application.
 
-3. **Decentralized Data Management**
+- **Decentralized Data Management**
 
-Each microservice often manages its own database, promoting data autonomy and reducing bottlenecks.
+  Each microservice often manages its own database, promoting data autonomy and reducing bottlenecks.
 
-4. **Technology Agnostic**
+.caveat[continued...]
 
-Different microservices can use different programming languages, frameworks, and data storage technologies as per their requirements.
+---
 
-5. **Resilience**
+#### Key Characteristics of Microservices (2/2)
 
-A failure in one service does not necessarily bring down the entire system due to fault-tolerance mechanisms and service isolation.
+- **Technology Agnostic**
 
-6. **Continuous Delivery and Deployment**
+  Different microservices can use different programming languages, frameworks, and data storage technologies as per their requirements.
 
-Enables faster development cycles and easier integration of new features or updates.
+- **Resilience**
+
+  A failure in one service does not necessarily bring down the entire system due to fault-tolerance mechanisms and service isolation.
+
+- **Continuous Delivery and Deployment**
+
+  Enables faster development cycles and easier integration of new features or updates.
+
+.caveat[...continued]
 
 ---
 
 #### Advantages of Microservices
 
-1. **Scalability**
+- **Scalability**
 
-Individual services can scale independently based on demand.
+  Individual services can scale independently based on demand.
 
-2. **Flexibility**
+- **Flexibility**
 
-Teams can work on different services simultaneously, speeding up development.
+  Teams can work on different services simultaneously, speeding up development.
 
-3. **Resilience**
+- **Resilience**
 
-Isolated failures reduce the risk of a complete system outage.
+  Isolated failures reduce the risk of a complete system outage.
 
-4. **Improved Maintainability**
+- **Improved Maintainability**
 
-Smaller codebases are easier to understand, test, and maintain.
+  Smaller codebases are easier to understand, test, and maintain.
 
-5. **Technology Diversity**
+- **Technology Diversity**
 
-Allows teams to choose the best tools for each service.
+  Allows teams to choose the best tools for each service.
 
 ---
 
 #### Challenges with Microservices
 
-1. **Complexity**
+- **Complexity**
 
-Managing many services increases the complexity of the system.
+  Managing many services increases the complexity of the system.
 
-2. **Deployment and Monitoring**
+- **Deployment and Monitoring**
 
-Requires sophisticated tools for orchestration (e.g., Kubernetes) and monitoring.
+  Requires sophisticated tools for orchestration (e.g., Kubernetes) and monitoring.
 
-3. **Inter-Service Communication**
+- **Inter-Service Communication**
 
-Ensuring reliable and efficient communication is critical.
+  Ensuring reliable and efficient communication is critical.
 
-4. **Data Consistency**
+- **Data Consistency**
 
-Maintaining consistency across services can be challenging, especially with distributed databases.
+  Maintaining consistency across services can be challenging, especially with distributed databases.
 
 ---
+class: center, middle
 
 #### Communication in Microservices
 
+---
+
 Microservices interact with each other primarily through:
 
-- **Synchronous communication**: Using APIs like REST or gRPC.
+- **Synchronous communication**: Using APIs like RE ST or gRPC.
 
-- **Asynchronous communication**: Using message brokers like RabbitMQ, Apache Kafka, or Amazon SQS.
+- **Asynchronous communication**: Using message br  okers like RabbitMQ, Apache Kafka, or Amazon SQS.
 
 ---
 class: center, middle
