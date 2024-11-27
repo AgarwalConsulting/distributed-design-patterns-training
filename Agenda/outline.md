@@ -26,7 +26,7 @@
       - Ability to Grow
       - Service Integration
       - Costs
-  - CAP Theorem
+  - CAP vs BASE vs PACELC
 
 - Application Design for Scalability
   - 12 Factor App Principles

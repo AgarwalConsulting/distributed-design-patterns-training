@@ -395,20 +395,7 @@ class: center, middle
 ---
 class: center, middle
 
-#### Communication in Microservices
-
----
-
-Microservices interact with each other primarily through:
-
-- **Synchronous communication**: Using APIs like RE ST or gRPC.
-
-- **Asynchronous communication**: Using message br  okers like RabbitMQ, Apache Kafka, or Amazon SQS.
-
----
-class: center, middle
-
-## Communication in a Client/Server Application
+### Client/Server Application
 
 ---
 class: center, middle
@@ -428,7 +415,7 @@ Generally, implemented over the internet (or intranet)
 ---
 class: center, middle
 
-### OSI Layers
+#### OSI Layers - Quick Refresher
 
 ![OSI Layers](assets/images/osi-layers.png)
 
@@ -437,8 +424,757 @@ class: center, middle
 ---
 class: center, middle
 
+### SOA
+
+---
+class: center, middle
+
+Service-Oriented Architecture (SOA) is an architectural style where an application is composed of loosely coupled, reusable services that communicate over a network.
+
+---
+class: center, middle
+
+Each service is designed to perform a specific business function and is accessible through a standard interface, making it easy to integrate services from different platforms, technologies, or organizations.
+
+---
+class: center, middle
+
+## Communication
+
+---
+
+Microservices/SOA interact with each other primarily through:
+
+- **Synchronous communication**: Using APIs like SOAP, REST or gRPC.
+
+- **Asynchronous communication**: Using message brokers like RabbitMQ, Apache Kafka, or Amazon SQS.
+
+---
+class: center, middle
+
+### SOAP
+
+---
+class: center, middle
+
+SOAP (Simple Object Access Protocol) is a protocol for exchanging structured information between systems over a network.
+
+---
+class: center, middle
+
+It is a widely used messaging protocol in Service-Oriented Architectures (SOA) and enables communication between applications, regardless of platform or programming language.
+
+---
+
+#### Key Features of SOAP
+
+- **XML-Based**
+
+  SOAP messages are encoded in XML, making them human-readable and platform-independent.
+
+- **Protocol-Agnostic**
+
+  SOAP can use various protocols for communication, including HTTP, HTTPS, SMTP, and more.
+
+- **Standards-Based**
+
+  It is defined by the **W3C** and follows strict standards for message formatting and communication.
+
+- **Extensibility**
+
+  Supports additional functionalities through headers, such as security, transactions, and routing.
+
+- **Error Handling**
+
+  Provides a structured way to return error information via fault messages.
+
+---
+class: center, middle
+
+#### Structure of a SOAP Message
+
+.caveat[~optional content~]
+
+---
+
+A SOAP message is composed of the following elements:
+
+- **Envelope**
+
+  - The root element that defines the message structure and namespaces.
+  - Example:
+
+    ```xml
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      ...
+    </soap:Envelope>
+    ```
+
+- **Header** (Optional)
+
+  - Contains metadata, such as authentication information or transaction context.
+  - Example:
+
+    ```xml
+    <soap:Header>
+      <authToken>ABC123</authToken>
+    </soap:Header>
+    ```
+
+.caveat[~optional content~]
+
+---
+
+- **Body**
+
+  - Contains the actual message or data being exchanged.
+  - Example:
+
+    ```xml
+    <soap:Body>
+      <getUserDetails>
+        <userId>123</userId>
+      </getUserDetails>
+    </soap:Body>
+    ```
+
+- **Fault** (Optional)
+
+  - A sub-element of the body used to return error details if something goes wrong.
+  - Example:
+
+    ```xml
+    <soap:Fault>
+      <faultcode>Client</faultcode>
+      <faultstring>Invalid user ID</faultstring>
+    </soap:Fault>
+    ```
+
+.caveat[~optional content~]
+
+---
+
+#### Example of a SOAP Request
+
+A SOAP request to fetch user details might look like this:
+
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <getUserDetails xmlns="http://example.com/user">
+      <userId>123</userId>
+    </getUserDetails>
+  </soap:Body>
+</soap:Envelope>
+```
+
+---
+
+#### Example of a SOAP Response
+
+The server might respond with:
+
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <getUserDetailsResponse xmlns="http://example.com/user">
+      <user>
+        <id>123</id>
+        <name>John Doe</name>
+        <email>john.doe@example.com</email>
+      </user>
+    </getUserDetailsResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+
+---
+
+#### Advantages of SOAP
+
+- **Platform and Language Agnostic**
+
+  Works with any platform and programming language.
+
+- **Extensive Standards**
+
+  Comprehensive standards for security (e.g., WS-Security), transactions, and reliability.
+
+- **Support for Complex Operations**
+
+  Handles complex operations like distributed transactions and stateful interactions.
+
+- **Error Handling**
+
+  Well-defined fault messages for robust error reporting.
+
+---
+
+#### Disadvantages of SOAP
+
+- **Verbosity**
+
+  SOAP messages can be large due to XML formatting, leading to increased network usage.
+
+- **Complexity**
+
+  The strict standards and extensive features make SOAP more complex than other protocols like REST.
+
+- **Performance**
+
+  Parsing XML can be slower compared to other lightweight formats like JSON.
+
+---
+class: center, middle
+
+### ReST
+
+**Re**presentational **S**tate **T**ransfer
+
+---
+class: center, middle
+
+ReST is an architectural style for designing networked applications.
+
+---
+class: center, middle
+
+It uses standard HTTP methods to interact with resources identified by URLs, and it emphasizes simplicity, scalability, and stateless communication.
+
+---
+
+#### HTTP Methods in REST
+
+| **Method**   | **Description**                              | **Example**               |
+|--------------|----------------------------------------------|---------------------------|
+| **GET**      | Retrieve a list of resources                 | `GET /users`              |
+| **GET**      | Retrieve a resource-based                    | `GET /users/123`          |
+| **POST**     | Create a new resource                        | `POST /users`             |
+| **PUT**      | Update an existing resource or create it     | `PUT /users/123`          |
+| **PATCH**    | Partially update a resource                  | `PATCH /users/123`        |
+| **DELETE**   | Delete a resource                            | `DELETE /users/123`       |
+
+---
+
+#### Example Request to Retrieve a User
+
+**GET** `https://api.example.com/users/123`
+
+**Response**:
+```json
+{
+  "id": 123,
+  "name": "John Doe",
+  "email": "john.doe@example.com"
+}
+```
+
+---
+
+#### Example Request to Create a New User
+
+**POST** `https://api.example.com/users`
+
+**Request Body**:
+
+```json
+{
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com"
+}
+```
+
+**Response**:
+
+```json
+{
+  "id": 124,
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com"
+}
+```
+
+---
+
+#### Key Principles of REST (1/2)
+
+- **Client-Server Architecture**
+
+  Separation of concerns between the client (user interface) and the server (data storage and processing).
+
+- **Statelessness**
+
+  Each request from a client to a server must contain all the information the server needs to process it. No client context is stored on the server between requests.
+
+- **Cacheability**
+
+  Responses should indicate whether they are cacheable to improve performance and scalability.
+
+---
+
+#### Key Principles of REST (2/2)
+
+- **Uniform Interface**
+
+  REST APIs should follow standard conventions, making them easy to understand and use. Key components include:
+
+  - **Resources**: Identified by URIs.
+  - **HTTP Methods**: Standard operations like GET, POST, PUT, DELETE.
+  - **Representation**: Data can be represented in formats like JSON, XML, or HTML.
+
+- **Layered System**
+
+  A RESTful system can be designed with layers (e.g., load balancers, caching systems) without affecting the client-server communication.
+
+- **Code on Demand (Optional)**
+
+  Servers can provide executable code to clients, such as JavaScript, to extend functionality dynamically.
+
+---
+
+#### Advantages of REST
+
+- **Simplicity**
+
+  Relies on standard HTTP methods and URIs, making it straightforward to understand and implement.
+
+- **Scalability**
+
+  Stateless communication and caching improve scalability.
+
+- **Flexibility**
+
+  Supports multiple formats (JSON, XML, etc.), making it versatile for various use cases.
+
+- **Interoperability**
+
+  Works across different platforms and languages using standard web protocols.
+
+- **Performance**
+
+  Caching mechanisms and lightweight formats like JSON ensure efficient communication.
+
+---
+
+#### Disadvantages of REST
+
+- **Stateless Nature**
+
+  Statelessness can lead to redundant data being sent in each request, impacting performance.
+
+- **Overhead**
+
+  Using HTTP headers and status codes can add some complexity compared to simpler communication models.
+
+- **Limited for Complex Operations**
+
+  May require workarounds for scenarios like long-running transactions or real-time communication.
+
+---
+
+### REST vs SOAP
+
+| **Aspect**              | **REST**                           | **SOAP**                            |
+|-------------------------|------------------------------------|-------------------------------------|
+| **Protocol**            | Architectural style (HTTP-based)   | Strict protocol (XML-based)         |
+| **Data Format**         | JSON, XML, or others               | Only XML                            |
+| **Ease of Use**         | Lightweight and simple             | Verbose and complex                 |
+| **State**               | Stateless                          | Stateful or stateless               |
+| **Security**            | Relies on HTTPS and OAuth          | Built-in standards like WS-Security |
+| **Flexibility**         | Highly flexible                    | Rigid standards                     |
+
+REST is ideal for modern web and mobile applications where simplicity and scalability are key.
+
+---
+class: center, middle
+
+### gRPC
+
+---
+class: center, middle
+
+#### Why gRPC?
+
+---
+class: center, middle
+
+Is it Protobuf?
+
+---
+class: center, middle
+
+gRPC uses Protobuf for serialization
+
+---
+
+Protobuf offers:
+
+- smaller payloads
+
+- faster serialization/deserialization
+
+compared to text-based formats like `JSON` or `XML`.
+
+---
+class: center, middle
+
+But, you can use protobuf with ReST too!
+
+---
+class: center, middle
+
+So, why gRPC!?
+
+---
+class: center, middle
+
+Let's look at TCP vs UDP...
+
+---
+class: center, middle
+
+![TCP vs UDP](assets/images/tcp-vs-udp.png)
+
+---
+class: center, middle
+
+Every TCP new TCP connection requires a new handshake!
+
+---
+class: center, middle
+
+gRPC avoids this by using **HTTP 2**!
+
+---
+class: center, middle
+
+![HTTP 1 vs HTTP 2](assets/images/http_1_vs_2.png)
+
+---
+
+#### Key Features of gRPC (1/2)
+
+- **Efficient Communication**
+
+  gRPC uses Protobuf for serialization, which is smaller and faster compared to text-based formats like JSON or XML.
+
+- **Cross-Language Support**
+
+  Supports many programming languages (e.g., C++, Java, Python, Go, etc.), allowing seamless communication in heterogeneous environments.
+
+- **Streaming**
+
+  Supports real-time communication through streaming:
+
+  - **Unary RPC**: One request and one response.
+
+  - **Server Streaming**: One request and multiple responses.
+
+  - **Client Streaming**: Multiple requests and one response.
+
+  - **Bidirectional Streaming**: Multiple requests and responses in real-time.
+
+---
+
+#### Key Features of gRPC (2/2)
+
+- **Multiplexing**
+
+  Built on **HTTP/2**, gRPC enables multiplexing of multiple requests over a single connection.
+
+- **Built-in Code Generation**
+
+  Protobuf definitions generate client and server code automatically, reducing boilerplate and ensuring consistency.
+
+- **Strong Typing**
+
+  Protobuf enforces strong typing, catching errors early during development.
+
+---
+
+#### Architecture of gRPC
+
+- **Client**
+
+  - Makes calls to the server using generated client stubs.
+
+  - Stubs are auto-generated from Protobuf definitions.
+
+- **Server**
+
+  Implements the service as defined in the Protobuf file and handles incoming RPCs.
+
+- **Protocol Buffers (Protobuf)**
+
+  Defines the data structures and services in a `.proto` file.
+
+- **Transport Layer**
+
+  Uses HTTP/2 for communication, offering features like compression, multiplexing, and low latency.
+
+---
+
+#### Protobuf Definition (`service.proto`)
+
+```proto
+syntax = "proto3";
+
+service UserService {
+  rpc GetUser (UserRequest) returns (UserResponse);
+}
+
+message UserRequest {
+  int32 user_id = 1;
+}
+
+message UserResponse {
+  int32 user_id = 1;
+  string name = 2;
+  string email = 3;
+}
+```
+
+---
+
+#### Advantages of gRPC
+
+- **High Performance**
+
+  Efficient serialization (Protobuf) and HTTP/2 reduce overhead, making gRPC faster than REST for many use cases.
+
+- **Streaming Support**
+
+  Real-time data transmission for use cases like chat applications or live monitoring.
+
+- **Language Interoperability**
+
+  Provides consistent communication across multiple programming languages.
+
+- **Auto-Generated Code**
+
+  Reduces manual effort and potential errors.
+
+- **Scalability**
+
+  Well-suited for microservices and large-scale systems.
+
+---
+
+#### Disadvantages of gRPC
+
+- **Steep Learning Curve**
+
+  Requires familiarity with Protobuf and the gRPC framework.
+
+- **Limited Browser Support**
+
+  Native gRPC does not work in browsers due to HTTP/2 limitations, requiring additional tools like gRPC-Web.
+
+- **Complexity**
+
+  More setup and tooling compared to simpler architectures like REST.
+
+- **Debugging**
+
+  Debugging binary-encoded Protobuf messages can be more challenging than JSON or XML.
+
+---
+class: center, middle
+
+### Honorable Mentions: WebSockets, graphQL
+
+---
+class: center, middle
+
+### Messaging
+
+---
+class: center, middle
+
+Messaging in software architecture refers to the exchange of information between components or systems in the form of messages.
+
+---
+class: center, middle
+
+It is a communication mechanism used in distributed systems to enable decoupled interactions between services, applications, or devices.
+
+---
+
+#### Key Concepts in Messaging (1/2)
+
+- **Messages**
+
+  The unit of communication that carries data between components.
+
+  - Messages can be structured (e.g., JSON, XML) or binary (e.g., Protocol Buffers).
+
+- **Message Queue**
+
+  A buffer where messages are temporarily stored until the receiving component processes them.
+
+- **Publish-Subscribe Model**
+
+  A messaging pattern where publishers send messages to a topic, and multiple subscribers receive those messages.
+
+---
+
+#### Key Concepts in Messaging (2/2)
+
+- **Point-to-Point Messaging**
+
+  A pattern where a message is sent from a producer to a single consumer via a queue.
+
+- **Event-Driven Architecture**
+
+  Messaging enables systems to respond to events asynchronously, improving scalability and responsiveness.
+
+---
+
+#### Messaging Patterns (1/2)
+
+- **Request-Response**
+
+  A sender sends a request and waits for a specific response.
+
+  - Example: A client requesting data from a server.
+
+- **Fire-and-Forget**
+
+  A sender sends a message and does not expect a response.
+
+  - Example: Logging messages to a monitoring system.
+
+- **Publish-Subscribe**
+
+  Publishers broadcast messages to topics, and subscribers receive messages from those topics.
+
+  - Example: Notifications or real-time chat systems.
+
+---
+
+#### Messaging Patterns (2/2)
+
+- **Message Routing**
+
+  Messages are directed to specific recipients based on rules or headers.
+
+  - Example: Filtering messages in an email system.
+
+- **Broadcasting**
+
+  Messages are sent to all connected consumers.
+
+  - Example: Live sports updates.
+
+---
+class: center, middle
+
+#### Messaging Middleware
+
+Messaging middleware, also known as **Message Brokers**, facilitates message exchange between distributed systems.
+
+---
+
+Examples include:
+
+- **RabbitMQ**:
+
+  - Open-source message broker supporting AMQP protocol.
+
+  - Great for task queues and real-time messaging.
+
+- **Apache Kafka**:
+
+  - Distributed event streaming platform.
+
+  - Ideal for high-throughput, real-time event processing.
+
+- **Amazon SQS**:
+
+  - Fully managed queue service by AWS.
+
+  - Asynchronous processing and task decoupling.
+
+- **ActiveMQ**:
+
+  - Open-source message broker with support for multiple protocols.
+
+---
+
+#### Advantages of Messaging
+
+- **Decoupling**
+
+  Components do not need to know about each other; they interact through messages.
+
+- **Asynchronous Communication**
+
+  Improves system responsiveness and scalability.
+
+- **Scalability**
+
+  Components can process messages at their own pace, handling load spikes effectively.
+
+- **Fault Tolerance**
+
+  Messages can be persisted, ensuring delivery even if components are temporarily unavailable.
+
+- **Real-Time Processing**
+
+  Messaging enables real-time systems, such as notifications or event streaming.
+
+---
+
+#### Disadvantages of Messaging
+
+- **Complexity**
+
+  Introducing messaging middleware adds complexity to the system architecture.
+
+- **Latency**
+
+  Asynchronous communication may introduce delays.
+
+- **Message Loss**
+
+  Improper configuration or failure of brokers can lead to message loss.
+
+- **Dependency**
+
+  Messaging systems can become a single point of failure without proper redundancy.
+
+---
+class: center, middle
+
+Messaging is the backbone of modern distributed systems, enabling asynchronous and scalable communication between services.
+
+---
+class: center, middle
+
+## [Distributed vs Cloud vs Serverless](https://github.com/AgarwalConsulting/distributed-design-patterns-training/blob/master/examples/01-architecture-overview/distributed-vs-cloud-vs-serverless.md)
+
+---
+class: center, middle
+
+## `CAP` vs `BASE` vs `PACLEC`
+
+.content-credits[https://medium.com/@ali.gelenler/distributed-system-trade-offs-cap-vs-base-vs-pacelc-1a3bcac04a7b]
+
+---
+class: center, middle
+
+## Application Design for Scalability
+
+---
+class: center, middle
+
+### [12 Factor Principles](https://12-factor-apps.slides.algogrit.com/)
+
+---
+class: center, middle
+
 Code
-https://github.com/AgarwalConsulting/presentation-distributed-design-patterns
+https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
 Slides
 https://distributed-design-patterns.slides.agarwalconsulting.com
