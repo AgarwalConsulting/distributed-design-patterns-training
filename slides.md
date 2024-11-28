@@ -1163,6 +1163,111 @@ class: center, middle
 ---
 class: center, middle
 
+### CAP theorem
+
+defines the limitations and trade-offs in a distributed system
+
+![CAP Theorem](assets/images/cap-theorem.png)
+
+---
+
+It suggests that distributed computer systems can only deliver two out of the following three guarantees:
+
+**Consistency**: Every node sees the same data even when concurrent updates occur
+
+**Availability**: All requests receive responses on whether it was a success or a failure
+
+**Partition tolerance**: The system will keep operating even if there is a network partition in communication between different nodes
+
+---
+class: center, middle
+
+In the case of a network partition, the CAP theorem forces a trade-off between *Consistency* and *Availability*.
+
+---
+
+A system must either:
+
+- Maintain consistency, but sacrifice availability (not all requests are responded to).
+
+- Maintain availability, but sacrifice consistency (some responses may be outdated).
+
+---
+class: center, middle
+
+### BASE
+
+is an acronym that represents an alternative to strict `ACID` properties
+
+![BASE Model](assets/images/base-model.png)
+
+---
+class: center, middle
+
+ACID properties
+
+(**A**tomicity, **C**onsistency, **I**solation, **D**urability)
+
+---
+
+class: center, middle
+
+It focuses on availability and performance over strong consistency.
+
+---
+
+- Basically Available (BA): The system is guaranteed to be available, but not necessarily consistent.
+
+- Soft State (S): The state of the system may change over time, even without input (because of eventual consistency).
+
+- Eventual Consistency (E): The system will become consistent eventually, once all updates have propagated.
+
+---
+class: center, middle
+
+BASE is a practical strategy to design systems that are highly available and partition tolerant, at the cost of immediate consistency.
+
+---
+class: center, middle
+
+It is often used in distributed, NoSQL systems, which prioritize scalability and availability.
+
+---
+class: center, middle
+
+### PACLEC
+
+is an Extension to the CAP theorem
+
+![PACLEC](assets/images/paclec.png)
+
+---
+class: center, middle
+
+It acknowledges that network partitions are not the only factor affecting system performance and behavior.
+
+---
+class: center, middle
+
+It also considers the trade-offs between latency and consistency during normal operations, which the CAP theorem does not address.
+
+---
+
+- *PAC*: If there is a Partition, you must choose between Availability and Consistency (this is the CAP theorem)
+
+- *ELC*: Else, when the system is running normally (no partition), you must choose between Latency and Consistency
+
+---
+
+In other words:
+
+- If there’s a partition, the system must decide between availability and consistency.
+
+- If there’s no partition, the system must decide between minimizing latency (faster responses) and ensuring strong consistency.
+
+---
+class: center, middle
+
 ## Application Design for Scalability
 
 ---
