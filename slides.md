@@ -1278,6 +1278,240 @@ class: center, middle
 ---
 class: center, middle
 
+### How can a team quickly create and setup a maintainable code base for a production-ready service so they can start developing its business logic?
+
+---
+class: center, middle
+
+If each service setup has to go through a complicated programming process, then it will be a huge overhead to develop a large number of microservices just to build them.
+
+---
+class: center, middle
+
+Moreover, apart from build logic, you need to handle cross cutting concerns.
+
+---
+
+Cross-cutting concern include:
+
+- Security
+- Externalized configuration
+- Logging
+- Health check
+- Metrics
+- Distributed tracing
+
+---
+class: center, middle
+
+we would like to have a service template that can be applied across the organization
+
+---
+class: center, middle
+
+Such a design pattern is called a **microservice chassis**
+
+---
+class: center, middle
+
+![Microservice chassis](assets/images/microservice_chassis.png)
+
+.image-credits[https://microservices.io/patterns/microservice-chassis.html]
+
+---
+
+#### How Chassis Works
+
+- **Develop the Chassis**
+
+  - Build a shared library, framework, or set of tools that implement the core features.
+
+  - Provide well-defined APIs for accessing these functionalities.
+
+- **Integrate into Microservices**
+
+  - Each microservice includes the chassis as a dependency.
+
+  - Services use the chassis to handle cross-cutting concerns.
+
+- **Enhance and Maintain**
+
+  - The chassis evolves independently of the business logic.
+
+  - New features or improvements in the chassis are propagated across all services using it.
+
+---
+class: center, middle
+
+The main benefit of a microservice chassis is that it’s faster and easier to keep the dependencies, build logic and cross-cutting concern logic up to date.
+
+---
+class: center, middle
+
+One issue is that you need a microservice chassis for each programming language/framework that you want to use.
+
+---
+class: center, middle
+
+### What about legacy applications?
+
+---
+class: center, middle
+
+use Strangler Pattern!
+
+---
+class: center, middle
+
+![Stranger Fig](assets/images/strangler-fig.jpg)
+
+.image-credits[https://martinfowler.com/bliki/StranglerFigApplication.html]
+
+---
+class: center, middle
+
+Modernize an application by incrementally developing a new (strangler) application around the legacy application.
+
+---
+class: center, middle
+
+In this scenario, the strangler application has a microservice architecture.
+
+---
+class: center, middle
+
+#### The Legacy Replacement Treadmill
+
+.content-credits[https://martinfowler.com/articles/patterns-legacy-displacement/]
+
+---
+
+#### Breaking the cycle
+
+- Understand the outcomes you want to achieve
+
+- Decide how to break the problem up into smaller parts
+
+- Successfully deliver the parts
+
+- Change the organization to allow this to happen on an ongoing basis
+
+---
+class: center, middle
+
+![Strangler Pattern](assets/images/strangler-pattern.jpg)
+
+---
+
+#### Pros of Strangler Pattern
+
+- Provides a way to reduce risk when doing a system transformation.
+
+- Keeps old services in play while refactoring to updated versions.
+
+- Adds uniquely new services while refactoring older services.
+
+---
+
+#### Cons of Strangler Pattern
+
+- Requires a lot of ongoing attention to routing and network management.
+
+- A refactor effort can get stuck in “adapter hell.” Each instance of strangling an old service in favor of a new one will require special logic to accommodate the rerouting from the old service to the new service. When you have dozens, if not hundreds of services in play, this can be a lot of work.
+
+- Requires making sure that you have a rollback plan in play for each refactored instance. Things will go wrong. You need to be able to roll back to the old way of doing things quickly and safely.
+
+---
+class: center, middle
+
+## Observability
+
+.content-credits[https://github.com/AgarwalConsulting/Kubernetes-Training/blob/master/notes/observability.md]
+
+---
+
+- Logging provides insight into application-specific messages emitted by processes.
+
+- Metrics provide quantitative information about processes running inside the system, including counters, gauges, and histograms.
+
+- Tracing, aka distributed tracing, provides insight into the full lifecycles, aka traces, of requests to the system, allowing you to pinpoint failures and performance issues.
+
+---
+class: center, middle
+
+### Metrics
+
+---
+class: center, middle
+
+![Prometheus Scrape](assets/images/prometheus-scrape.png)
+
+.image-credits[https://blog.pvincent.io/2017/12/prometheus-blog-series-part-3-exposing-and-collecting-metrics/]
+
+---
+class: center, middle
+
+Introspection using `/healthz`
+
+---
+class: center, middle
+
+*Eg*: [Liveness](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) probes in K8s
+
+---
+class: center, middle
+
+#### Prometheus & Grafana
+
+---
+class: center, middle
+
+![Prometheus Architecture](assets/images/prometheus-architecture.png)
+
+.image-credits[https://logz.io/blog/prometheus-vs-graphite/]
+
+---
+class: center, middle
+
+Push vs Pull mechanisms
+
+---
+class: center, middle
+
+![Prometheus Gathering](assets/images/prometheus-gathering.png)
+
+.image-credits[https://devconnected.com/the-definitive-guide-to-prometheus-in-2019/]
+
+---
+class: center, middle
+
+### Distributed Tracing
+
+---
+class: center, middle
+
+#### Using [OpenTelemetry](https://opentelemetry.io/)
+
+---
+class: center, middle
+
+![Pluggable Architecture](assets/images/opentelemetry-pluggable.png)
+
+.image-credits[https://medium.com/opentelemetry/opentelemetry-beyond-getting-started-5ac43cd0fe26]
+
+---
+
+##### Other Popular Tools for Distributed Tracing
+
+- [Jaeger](https://www.jaegertracing.io/docs/1.18/)
+
+- [Zipkin](https://zipkin.io/)
+
+- [Appdash](https://github.com/sourcegraph/appdash)
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
