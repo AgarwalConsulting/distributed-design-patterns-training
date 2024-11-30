@@ -1346,6 +1346,16 @@ class: center, middle
 The main benefit of a microservice chassis is that it’s faster and easier to keep the dependencies, build logic and cross-cutting concern logic up to date.
 
 ---
+
+##### Challenges with Chassis
+
+- **Complexity in Design**: Creating a robust and extensible chassis can be challenging.
+
+- **Dependency Management**: Updating the chassis in multiple services may require careful versioning and deployment strategies.
+
+- **Overhead**: A poorly designed chassis might add unnecessary complexity or performance overhead.
+
+---
 class: center, middle
 
 One issue is that you need a microservice chassis for each programming language/framework that you want to use.
