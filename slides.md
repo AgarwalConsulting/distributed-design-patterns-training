@@ -405,7 +405,12 @@ A client/server application is a distributed system where the application is div
 ---
 class: center, middle
 
-The client initiates requests, and the server processes those requests and provides responses. This model separates the user interface and user interactions (client-side) from the data storage and processing (server-side), making it a fundamental architecture for many modern applications.
+The client initiates requests, and the server processes those requests and provides responses.
+
+---
+class: center, middle
+
+This model separates the user interface and user interactions (client-side) from the data storage and processing (server-side), making it a fundamental architecture for many modern applications.
 
 ---
 class: center, middle
@@ -493,8 +498,6 @@ class: center, middle
 
 #### Structure of a SOAP Message
 
-.caveat[~optional content~]
-
 ---
 
 A SOAP message is composed of the following elements:
@@ -520,8 +523,6 @@ A SOAP message is composed of the following elements:
       <authToken>ABC123</authToken>
     </soap:Header>
     ```
-
-.caveat[~optional content~]
 
 ---
 
@@ -549,8 +550,6 @@ A SOAP message is composed of the following elements:
       <faultstring>Invalid user ID</faultstring>
     </soap:Fault>
     ```
-
-.caveat[~optional content~]
 
 ---
 
