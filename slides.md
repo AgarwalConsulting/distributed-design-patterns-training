@@ -1521,6 +1521,475 @@ class: center, middle
 ---
 class: center, middle
 
+## Patterns for Concurrent Systems
+
+---
+
+1. Active Object
+
+2. Monitor Object
+
+3. Lock
+
+4. Thread-Specific Storage
+
+5. Scheduler
+
+6. Thread Pool
+
+7. Async Completion Token
+
+8. Lamport Clock
+
+9. Generation Clock
+
+10. Hybrid Clock
+
+11. Reactor
+
+12. Proctor
+
+---
+class: center, middle
+
+### 1. Active Object
+
+---
+class: center, middle
+
+The **Active Object** pattern aims to decouple method execution from method invocation.
+
+---
+class: center, middle
+
+It does this by introducing an intermediary object that maintains a queue of requests to be executed in a separate thread or process.
+
+---
+class: center, middle
+
+This pattern is useful when you want to simplify synchronization and concurrency in systems where multiple clients need to invoke methods on a shared object.
+
+---
+class: center, middle
+
+It allows clients to make non-blocking method calls, as the results are computed asynchronously.
+
+---
+
+- **Decoupled Execution**: Separates method invocation from execution.
+
+- **Asynchronous Calls**: Clients can invoke methods without blocking.
+
+- **Concurrency Management**: Ensures thread-safe access to shared resources.
+
+- **Request Queue**: Uses a queue to serialize and manage requests.
+
+---
+
+#### Use Cases of Active Object
+
+- GUI systems where UI updates and backend computations run in different threads.
+
+- Asynchronous task processing in distributed systems.
+
+---
+class: center, middle
+
+### 2. Monitor Object
+
+---
+class: center, middle
+
+The **Monitor Object** pattern is a synchronization construct that encapsulates shared data and operations on the data, ensuring that only one thread accesses the shared data at a time.
+
+---
+class: center, middle
+
+This pattern uses mutual exclusion (e.g., a lock or mutex) to prevent race conditions.
+
+---
+
+- **Encapsulation**: Combines data and methods into a single synchronized unit.
+
+- **Mutual Exclusion**: Ensures that only one thread can execute a method at a time.
+
+- **Condition Variables**: Often includes mechanisms to wait for or signal events.
+
+- **Thread-Safe**: Simplifies multi-threaded programming by hiding synchronization details.
+
+---
+
+#### Use Cases of Monitor Object
+
+- Protecting critical sections in multithreaded applications.
+
+- Implementing thread-safe data structures.
+
+---
+class: center, middle
+
+### 3. Lock
+
+---
+class: center, middle
+
+A **Lock** is a low-level synchronization primitive that provides mutual exclusion for accessing shared resources.
+
+---
+class: center, middle
+
+Threads or goroutines acquire a lock before accessing a shared resource and release it afterward.
+
+---
+class: center, middle
+
+Locks help prevent race conditions and ensure data consistency.
+
+---
+
+- **Mutual Exclusion**: Ensures that only one thread can access a resource at a time.
+
+- **Blocking/Non-blocking**: Supports both blocking locks (e.g., mutexes) and non-blocking mechanisms (e.g., spinlocks).
+
+- **Granularity**: Can be fine-grained (per resource) or coarse-grained (spanning multiple resources).
+
+- **Deadlock Prevention**: Requires careful design to avoid deadlocks.
+
+---
+
+#### Use Cases of Lock
+
+- Protecting critical sections in concurrent code.
+
+- Managing shared resources such as files, memory, or network connections.
+
+---
+class: center, middle
+
+### 4. Thread-Specific Storage
+
+---
+class: center, middle
+
+**Thread-Specific Storage** (TSS) is a technique for associating data with the thread or context that is executing a piece of code.
+
+---
+class: center, middle
+
+Each thread has its own storage, allowing threads to maintain unique data without interfering with each other.
+
+---
+
+- **Thread Isolation**: Each thread has its own separate data storage.
+
+- **No Interference**: Prevents data corruption in multi-threaded environments.
+
+- **Context Association**: Often tied to a thread context (e.g., transaction IDs, user sessions).
+
+- **Automatic Cleanup**: Some implementations clean up storage when a thread exits.
+
+---
+
+#### Use Cases of Thread-Specific Storage
+
+- Caching frequently accessed data for individual threads.
+
+- Maintaining thread-specific state, such as transaction contexts in database systems.
+
+---
+class: center, middle
+
+### 5. Scheduler
+
+---
+class: center, middle
+
+A **Scheduler** is responsible for managing the execution of tasks, threads, or processes in a system.
+
+---
+class: center, middle
+
+It determines the order of execution and allocates system resources like CPU time.
+
+---
+class: center, middle
+
+Scheduling can be static (predefined order) or dynamic (priority-based, round-robin, etc.).
+
+---
+
+- **Task Prioritization**: Supports static or dynamic prioritization of tasks.
+
+- **Resource Allocation**: Allocates CPU, memory, or other resources efficiently.
+
+- **Fairness**: Ensures equitable execution of tasks (e.g., round-robin, fair queuing).
+
+- **Real-Time Support**: Some schedulers guarantee deadlines in real-time systems.
+
+---
+
+#### Use Cases of Scheduler
+
+- Task scheduling in real-time or operating systems.
+
+- Distributing tasks among workers in parallel processing systems.
+
+---
+class: center, middle
+
+### 6. Thread Pool
+
+---
+class: center, middle
+
+A **Thread Pool** is a collection of pre-initialized worker threads that execute tasks from a queue.
+
+---
+class: center, middle
+
+Thread pools reduce the overhead of creating and destroying threads repeatedly, as threads are reused for multiple tasks.
+
+---
+
+- **Resource Reuse**: Reuses threads, reducing the overhead of thread creation and destruction.
+
+- **Task Queue**: Maintains a queue of tasks waiting to be executed.
+
+- **Concurrency Control**: Limits the number of active threads to avoid overwhelming the system.
+
+- **Scalability**: Efficiently handles a large number of tasks.
+
+---
+
+#### Use Cases of Thread Pool
+
+- High-throughput servers like web servers or databases.
+
+- Background job processing systems.
+
+---
+class: center, middle
+
+#### Does Go require Thread Pooling?
+
+---
+class: center, middle
+
+*Go Scheduler*
+
+.content-credits[https://go-fundamentals.slides.algogrit.com/#3]
+
+---
+class: center, middle
+
+### 7. Async Completion Token
+
+---
+class: center, middle
+
+The **Async Completion Token** pattern is a way to handle the results of asynchronous operations.
+
+---
+class: center, middle
+
+A token (such as a callback, promise, or channel) is returned when an asynchronous operation is initiated.
+
+---
+class: center, middle
+
+The token is used later to retrieve the result or notification when the operation completes.
+
+---
+
+- **Non-blocking**: Initiates an asynchronous operation without waiting for it to complete.
+
+- **Result Handling**: Provides a mechanism (e.g., callback, future, channel) to handle results or errors.
+
+- **Concurrency**: Supports multiple overlapping asynchronous operations.
+
+- **Decoupled Workflow**: Separates the initiation of a task from its completion handling.
+
+---
+
+#### Use Cases of Async Completion Token
+
+- Managing asynchronous I/O operations.
+
+- Handling responses from remote services or APIs.
+
+---
+class: center, middle
+
+### 8. Lamport Clock
+
+---
+class: center, middle
+
+A **Lamport Clock** is a logical clock used in distributed systems to track the order of events.
+
+---
+class: center, middle
+
+It assigns a monotonically increasing number to each event, ensuring a consistent ordering without relying on synchronized physical clocks.
+
+---
+
+- **Event Ordering**: Ensures a consistent logical order of events in distributed systems.
+
+- **Monotonicity**: Logical clock values always increase.
+
+- **Causality Tracking**: Helps determine if one event happened before another.
+
+- **Lightweight**: Requires minimal computation and storage.
+
+---
+
+#### Use Cases of Lamport Clock
+
+- Ensuring event ordering in distributed databases or message queues.
+
+- Conflict resolution in distributed version control systems like Git.
+
+---
+class: center, middle
+
+### 9. Generation Clock
+
+---
+class: center, middle
+
+A **Generation Clock** is a logical clock that tracks "generations" or epochs of changes.
+
+---
+class: center, middle
+
+It is often used in systems where changes to data are grouped into identifiable sets, and the clock advances with each new set of changes.
+
+---
+
+- **Epoch-Based**: Tracks changes in terms of generations or epochs.
+
+- **Change Coordination**: Advances only when significant changes occur.
+
+- **Conflict Resolution**: Useful for versioning and identifying outdated data.
+
+- **Compact Representation**: Often represents state with a single counter.
+
+---
+
+#### Use Cases of Generation Clock
+
+- Versioning in storage systems or databases.
+
+- Coordinating updates in cache invalidation mechanisms.
+
+---
+class: center, middle
+
+### 10. Hybrid Clock
+
+---
+class: center, middle
+
+A **Hybrid Clock** combines the properties of logical clocks (like Lamport clocks) and physical clocks (real-time clocks).
+
+---
+class: center, middle
+
+It uses physical time for ordering when possible and falls back to logical increments when clocks are unsynchronized.
+
+---
+
+- **Physical and Logical Time**: Combines real-world timestamps with logical ordering.
+
+- **Causal Consistency**: Ensures events respect causality.
+
+- **Low Latency**: Provides event ordering with minimal delay.
+
+- **Clock Drift Tolerance**: Handles slight inconsistencies in physical clocks.
+
+---
+
+#### Use Cases of Hybrid Clock
+
+- Distributed systems requiring low-latency event ordering.
+
+- Systems that need both causal consistency and approximate real-time ordering.
+
+---
+class: center, middle
+
+### 11. Reactor
+
+---
+class: center, middle
+
+The **Reactor** pattern is an event-driven architecture commonly used in I/O-bound systems.
+
+---
+class: center, middle
+
+It listens for and demultiplexes multiple event sources, dispatching them to appropriate event handlers.
+
+---
+class: center, middle
+
+This pattern is especially popular in network servers.
+
+---
+
+- **Event-Driven**: Listens for and handles multiple events asynchronously.
+
+- **Demultiplexing**: Routes events to the appropriate handler.
+
+- **Non-blocking I/O**: Efficiently manages input/output without thread blocking.
+
+- **High Scalability**: Suitable for handling many simultaneous connections or tasks.
+
+---
+
+#### Use Cases of Reactor
+
+- Asynchronous I/O in network servers (e.g., `select` or `epoll` in Unix systems).
+
+- Event-driven GUI frameworks.
+
+---
+class: center, middle
+
+### 12. Proctor
+
+---
+class: center, middle
+
+The **Proctor** pattern is a management and monitoring pattern often used for health checks or system monitoring.
+
+---
+class: center, middle
+
+It encapsulates logic for assessing the health or state of a system component and reporting the results.
+
+---
+
+- **Health Monitoring**: Regularly checks the state or health of a system component.
+
+- **Error Detection**: Identifies failing or degraded components.
+
+- **Automated Remediation**: Can trigger corrective actions based on health checks.
+
+- **Reporting**: Provides insights into system health for administrators or monitoring systems.
+
+---
+
+#### Use Cases of Proctor
+
+- Monitoring system components like databases, APIs, or microservices.
+
+- Implementing health-check endpoints in distributed systems.
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
