@@ -1990,6 +1990,245 @@ It encapsulates logic for assessing the health or state of a system component an
 ---
 class: center, middle
 
+## Data Management Patterns within a single service
+
+---
+
+1. Event Sourcing
+
+2. Domain Event
+
+3. Saga
+
+4. Write-Ahead Log
+
+5. Two-Phase Commit
+
+---
+class: center, middle
+
+### 1. Event Sourcing
+
+---
+class: center, middle
+
+Event Sourcing is a pattern where the state of an application is derived by replaying a sequence of events rather than storing the current state directly.
+
+---
+class: center, middle
+
+Instead of persisting the current state of an entity, every change to the state is recorded as an immutable event in an event store.
+
+---
+class: center, middle
+
+In Event Sourcing, all changes to an application's state are captured as a sequence of events.
+
+---
+
+#### Benefits of Event Sourcing
+
+- Complete history of changes.
+
+- Ability to reconstruct past states for debugging or auditing.
+
+- Enables temporal queries (e.g., "What was the state on a specific date?").
+
+- Works well with CQRS (Command Query Responsibility Segregation).
+
+---
+
+#### Challenges of Event Sourcing
+
+- Complexity in replaying events to rebuild the state.
+
+- Handling schema changes in events over time.
+
+---
+class: center, middle
+
+**Example:** In a banking system, instead of storing the current account balance, events like "Deposit $100" or "Withdraw $50" are stored and replayed to calculate the balance.
+
+---
+class: center, middle
+
+### 2. Domain Event
+
+---
+class: center, middle
+
+A Domain Event represents something significant that happens in the domain of the system, usually reflecting a business process or rule.
+
+---
+class: center, middle
+
+Domain Events are immutable, describing what has happened (not what will happen), and are often used to trigger actions or workflows.
+
+---
+class: center, middle
+
+Domain Events represent significant events within a domain that other parts of the system may react to.
+
+---
+
+#### Benefits of Domain Event
+
+- Decouples parts of the system through event-based communication.
+
+- Captures domain knowledge explicitly.
+
+- Supports eventual consistency across bounded contexts.
+
+---
+
+#### Challenges of Domain Event
+
+- Managing event propagation and delivery reliability.
+
+- Ensuring correct sequencing when multiple events are generated.
+
+---
+class: center, middle
+
+**Example:** In an e-commerce system, an event like "OrderPlaced" could trigger notifications, inventory updates, or shipping processes.
+
+---
+class: center, middle
+
+### 3. Two-Phase Commit (2PC)
+
+---
+class: center, middle
+
+Two-Phase Commit (2PC) is a protocol for distributed transactions.
+
+---
+class: center, middle
+
+Two-Phase Commit is a distributed transaction protocol ensuring that all participants in a transaction either commit or rollback changes to maintain consistency.
+
+---
+
+#### Phases
+
+1. **Prepare Phase:** The coordinator asks all participants if they can commit. Participants perform preliminary checks and respond with "ready" or "abort."
+
+2. **Commit Phase:** If all participants are ready, the coordinator sends a "commit" message; otherwise, it sends "rollback."
+
+---
+
+#### Benefits of 2PC
+
+- Strong consistency across systems.
+
+---
+
+#### Challenges of 2PC
+
+- Performance bottleneck due to synchronization.
+
+- Risk of blocking resources if participants fail or time out.
+
+---
+class: center, middle
+
+**Example:** Transferring money between two banks requires both to either confirm the transfer or cancel it entirely.
+
+---
+class: center, middle
+
+### 4. Saga
+
+---
+class: center, middle
+
+A Saga is a long-running distributed transaction pattern where a series of local transactions are coordinated by passing messages/events.
+
+---
+class: center, middle
+
+Each transaction has a compensating transaction to rollback changes in case of failure.
+
+---
+
+#### Types of Saga
+
+- **Choreography:** Decentralized, with participants reacting to events.
+
+- **Orchestration:** Centralized, with a controller dictating the flow.
+
+---
+
+#### Benefits of Saga
+
+- Better performance than 2PC as it avoids locking resources.
+
+- Scalability due to eventual consistency.
+
+---
+
+#### Challenges of Saga
+
+- Compensating transactions can be complex to implement.
+
+- Handling failure scenarios requires careful design.
+
+---
+class: center, middle
+
+**Example:** Booking a trip may involve reserving flights, hotels, and car rentals. If one reservation fails, the other reservations must be canceled.
+
+---
+class: center, middle
+
+### 5. Write-Ahead Log (WAL)
+
+---
+class: center, middle
+
+Write-Ahead Log is a pattern where changes are first written to a log before being applied to the database.
+
+---
+class: center, middle
+
+In a simplified system, a Write-Ahead Log ensures durability by writing changes to a log before committing them to the database.
+
+---
+class: center, middle
+
+This ensures that no data is lost in case of a crash.
+
+---
+class: center, middle
+
+The log acts as a single source of truth for all updates and can be replayed to recover or reconstruct the state.
+
+---
+
+#### Benefits of WAL
+
+- Guarantees durability (important for ACID properties in databases).
+
+- Simplifies crash recovery.
+
+- Enables replication and fault tolerance.
+
+---
+
+#### Challenges of WAL
+
+- Log can grow large, requiring pruning or compaction.
+
+- Performance overhead due to logging.
+
+---
+class: center, middle
+
+**Example:** In relational databases like PostgreSQL, WAL ensures that transactions are recorded and can be replayed after a crash.
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
