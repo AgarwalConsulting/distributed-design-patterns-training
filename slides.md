@@ -2702,6 +2702,15 @@ spec:
 ---
 class: center, middle
 
+```text
+[Service] -- Adapter (Data Translator)
+[Service + Sidecar] -- Sidecar (Logging)
+[Ambassador] -- (Ingress Traffic Proxy)
+```
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
