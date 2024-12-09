@@ -2229,6 +2229,479 @@ class: center, middle
 ---
 class: center, middle
 
+## Data Management Patterns across services
+
+---
+class: center, middle
+
+### 1. API Composition
+
+---
+class: center, middle
+
+A pattern used in microservices architecture where a single API aggregates and composes data or functionality from multiple microservices into a unified response for clients.
+
+---
+class: center, middle
+
+Main Intent is to avoid the client making multiple requests to various services, improving efficiency and reducing complexity on the client-side.
+
+---
+class: center, middle
+
+A dedicated API gateway or composition service aggregates data from multiple services.
+
+---
+class: center, middle
+
+The aggregator may perform synchronous calls to the underlying services or use asynchronous methods (e.g., messaging).
+
+---
+
+#### Challenges with API Composition
+
+- Performance bottlenecks if many dependent services must be called.
+
+- Potential for cascading failures when one service is unavailable.
+
+---
+
+#### Solutions with API Composition
+
+- Caching responses from services.
+
+- Implementing fallback mechanisms.
+
+---
+class: center, middle
+
+**Example:** A service that combines data from a product catalog service, a pricing service, and a reviews service to provide a single "product details" API.
+
+---
+class: center, middle
+
+### 2. Command Query Responsibility Segregation (CQRS)
+
+---
+class: center, middle
+
+A pattern where the responsibility for **writing (commands)** and **reading (queries)** data is separated into different models.
+
+---
+
+#### Command Side (Write Model)
+
+- Responsible for handling updates (create, update, delete).
+
+- Typically uses normalized data structures to ensure data integrity.
+
+#### Query Side (Read Model)
+
+- Optimized for fast data retrieval, often using denormalized or aggregated data.
+
+- Can use different storage technologies than the write model (e.g., relational for writes and NoSQL for reads).
+
+---
+
+#### Benefits of CQRS
+
+- Optimizes the data model for reads and writes separately.
+
+- Improves scalability, especially for read-heavy systems.
+
+---
+
+#### Challenges of CQRS
+
+- Keeping read and write models in sync can be complex.
+
+- Eventual consistency is often required.
+
+---
+class: center, middle
+
+**Example:** A write service updates customer orders in a relational database, while a read service uses a NoSQL database optimized for fast querying of aggregated order data.
+
+---
+class: center, middle
+
+### 3. Transactional Outbox
+
+---
+class: center, middle
+
+A pattern used to ensure consistency between changes to a database and messages sent to a messaging system (e.g., Kafka).
+
+---
+
+#### Why use Transactional Outbox
+
+- Ensures atomicity in scenarios where both a database update and a message/event must succeed.
+
+- Solves issues in distributed systems without requiring distributed transactions.
+
+---
+
+#### How Transactional Outbox  works
+
+- Write to the application database and the outbox table in the same transaction.
+
+- A background worker reads from the outbox and publishes messages to the messaging system (e.g., RabbitMQ or Kafka).
+
+---
+class: center, middle
+
+**Challenge**: Requires efficient and reliable background processing to clear the outbox table.
+
+---
+class: center, middle
+
+**Example:** In an **order service**, an "order placed" event is written to the outbox when an order is saved. A worker publishes the event to Kafka.
+
+---
+class: center, middle
+
+### 4. Orchestration vs. Choreography
+
+---
+class: center, middle
+
+#### Orchestration
+
+A centralized service (or orchestrator) coordinates and controls the interactions between microservices.
+
+---
+
+##### Pros of Orchestrating
+
+- Easier to monitor and debug.
+
+- Predictable flow of control.
+
+##### Cons of Orchestrating
+
+- Single point of failure.
+
+- Can become a bottleneck.
+
+---
+class: center, middle
+
+**Example**: A workflow engine like Camunda handles the sequence of operations for order fulfillment.
+
+---
+class: center, middle
+
+#### Choreography
+
+Each service reacts to events and independently decides the next step, relying on event-driven communication.
+
+---
+
+##### Pros of Choreography
+
+- Loose coupling.
+
+- Scales well in distributed systems.
+
+##### Cons of Choreography
+
+- Harder to trace and debug.
+
+- Requires well-defined events and schemas.
+
+---
+class: center, middle
+
+**Example**: An "order placed" event triggers inventory and payment services to act independently.
+
+---
+class: center, middle
+
+### 5. Service Registry
+
+---
+class: center, middle
+
+A database where microservices register themselves with their network addresses and metadata.
+
+---
+class: center, middle
+
+This enables dynamic discovery of services in environments where services frequently change.
+
+---
+
+#### Popular Tools for Service Registry
+
+- **Eureka (Netflix):** Used with Spring Cloud.
+
+- **Consul (HashiCorp):** A versatile registry with key-value storage.
+
+- **Zookeeper (Apache):** Often used for distributed systems.
+
+---
+
+#### Common Features
+
+- Health checks to ensure registered services are functional.
+
+- Load balancing and metadata for enhanced service interactions.
+
+---
+
+**Example:** A registry entry for a **user service**
+
+```
+Name: user-service
+Address: http://10.0.0.5
+Port: 8080
+Metadata: {"version": "1.0.1", "env": "prod"}
+```
+
+---
+class: center, middle
+
+### 6. Service Discovery
+
+---
+class: center, middle
+
+The mechanism by which services locate each other dynamically without relying on hardcoded addresses.
+
+---
+
+#### Types of Service Discovery
+
+- **Client-Side Discovery:** The client queries the service registry to find the service (e.g., Netflix Ribbon).
+
+- **Server-Side Discovery:** A load balancer queries the registry and forwards requests to the appropriate service (e.g., AWS ALB with ECS).
+
+---
+
+#### Challenges with Service Discovery
+
+- Ensuring the registry is updated quickly when services go down or change addresses.
+
+- Security concerns (e.g., untrusted services).
+
+---
+
+#### Service Discovery Example
+
+**Eureka** as a service registry, where clients query Eureka for available services.
+
+#### **Code Example (Spring Cloud with Eureka Client):**
+
+```java
+@RestController
+public class MyController {
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @RequestMapping("/get-product")
+    public String getProductDetails() {
+        String serviceUrl = "http://product-service/products/1";
+        return restTemplate.getForObject(serviceUrl, String.class);
+    }
+}
+```
+
+The `RestTemplate` uses the service name (`product-service`) to automatically resolve the URL via **Eureka**.
+
+---
+class: center, middle
+
+#### How about Service Registry/Discovery in Kubernetes?
+
+---
+class: center, middle
+
+### 7. Self Registration
+
+---
+class: center, middle
+
+Services register themselves directly into the service registry upon startup and deregister upon shutdown.
+
+---
+
+#### Pros of Self Registration
+
+- Simplifies setup since each service handles its own registration.
+
+#### Cons of Self Registration
+
+- Tight coupling between the service and the registry.
+
+- Registry APIs must be accessible to all services.
+
+---
+class: center, middle
+
+**Example:** A microservice updates a Consul registry with its address and health status via an API.
+
+---
+class: center, middle
+
+### 8. Circuit Breaker
+
+---
+class: center, middle
+
+A pattern designed to prevent cascading failures in distributed systems by monitoring service health and stopping requests to unhealthy services.
+
+---
+
+#### How Circuit Breakers work
+
+- Monitors the failure rate of calls to a service.
+
+- When failures exceed a threshold, the circuit "opens," stopping further calls.
+
+- After a cooldown period, the circuit enters "half-open" state, allowing limited calls to test recovery.
+
+---
+
+#### Phases of Circuit Breaker Pattern
+
+- **Closed:** Requests flow normally.
+
+- **Open:** Requests are blocked due to repeated failures.
+
+- **Half-Open:** Some requests are allowed to check if the service has recovered.
+
+---
+
+#### Benefits of Circuit Breaker
+
+- Prevents cascading failures in a distributed system.
+
+- Improves system resilience.
+
+---
+class: center, middle
+
+**Example Tools:** Netflix Hystrix, Resilience4j.
+
+---
+class: center, middle
+
+**Example:** If the **inventory service** is slow or unresponsive, the circuit breaker stops calls and returns a fallback response.
+
+---
+class: center, middle
+
+### 9. Adapter vs. Sidecar vs. Ambassador
+
+---
+class: center, middle
+
+#### Adapter
+
+A service-specific component that adapts legacy systems or external APIs to work with modern applications.
+
+---
+class: center, middle
+
+Acts as a translator or bridge.
+
+---
+class: center, middle
+
+**Example**: A module that translates REST requests into SOAP for a legacy service.
+
+---
+class: center, middle
+
+#### Sidecar
+
+A companion container/process that provides non-business-critical functionality for the main service.
+
+---
+class: center, middle
+
+Runs alongside a service to provide auxiliary functionality (e.g., logging, monitoring).
+
+---
+class: center, middle
+
+*Use Case of Sidecar:* Added features without modifying the main service.
+
+---
+class: center, middle
+
+**Example:** Envoy proxy used for telemetry in Kubernetes.
+
+---
+
+```yaml
+# Kubernetes YAML for a sidecar (Envoy)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: my-app
+          image: my-app-image
+        - name: envoy
+          image: envoyproxy/envoy
+          ports:
+            - containerPort: 10000
+```
+
+---
+class: center, middle
+
+#### Ambassador
+
+Specialized sidecar that acts as an external proxy for the service.
+
+---
+class: center, middle
+
+A proxy that handles traffic into/out of the service mesh (e.g., API Gateway).
+
+---
+class: center, middle
+
+A specialized sidecar that acts as an API gateway or proxy for a service, handling external communication (e.g., routing, authentication).
+
+---
+class: center, middle
+
+*Use Case of Ambassador:* Exposing services to the outside world with additional features like TLS termination.
+
+---
+class: center, middle
+
+**Example:** Ambassador API Gateway in Kubernetes clusters.
+
+---
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ambassador-gateway
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: ambassador
+          image: datawire/ambassador
+          ports:
+            - containerPort: 8000
+```
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
