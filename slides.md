@@ -3602,6 +3602,156 @@ class: center, middle
 ---
 class: center, middle
 
+## Consistency Patterns for Sharded Systems
+
+---
+class: center, middle
+
+### 1. Idempotent Consumer
+
+---
+class: center, middle
+
+An **idempotent consumer** is a system or process that can handle the same input multiple times without causing unintended side effects or changes in state.
+
+---
+class: center, middle
+
+This concept is crucial in distributed systems, especially in message processing systems, to ensure reliability and consistency even in cases where messages are delivered more than once.
+
+---
+class: center, middle
+
+Prevent duplicate processing when a message is redelivered due to retries, failures, or timeouts.
+
+---
+class: center, middle
+
+Let's consider the different message delivery guarantees...
+
+---
+
+1. **At Most Once**: Messages might be lost but never duplicated. (Low reliability)
+
+2. **At Least Once**: Messages are never lost but might be duplicated. (High reliability, potential redundancy)
+
+3. **Exactly Once**: Messages are delivered only once, with no loss or duplication. (High reliability, complex to implement)
+
+4. **Best Effort**: No guarantees; delivery may fail or duplicate. (Unreliable, simple)
+
+5. **Ordered Delivery**: Messages arrive in the order sent. (Ensures sequence consistency)
+
+6. **Causal Delivery**: Messages respecting causal relationships are delivered in order. (Ensures causality)
+
+7. **Durable Delivery**: Messages are stored persistently to ensure no loss. (Fault-tolerant)
+
+---
+class: center, middle
+
+What about Kafka?
+
+---
+
+#### Approaches to implement an idempotent consumer
+
+- **Tracking Processed Messages**: Use unique message IDs or offsets and maintain a record of already-processed messages.
+
+- **Atomic Operations**: Ensure that processing a message and marking it as processed is an atomic operation.
+
+- **Statelessness**: Design the consumer logic to be naturally idempotent, such as calculating a value or writing the same data to a datastore.
+
+---
+class: center, middle
+
+**Example:** If a payment processor receives a payment request twice for the same transaction, it should only process the payment once. The processor can check a transaction ID before proceeding.
+
+---
+class: center, middle
+
+### 2. Write-Ahead Log (WAL)
+
+---
+class: center, middle
+
+A **write-ahead log** is a technique used in databases and distributed systems to ensure data durability and consistency.
+
+---
+class: center, middle
+
+Before making any changes to the database, the changes are first recorded in a log.
+
+---
+class: center, middle
+
+This ensures that even in the event of a crash, the system can recover the intended state by replaying the log.
+
+---
+
+#### How WAL works
+
+- Changes (e.g., inserts, updates) are appended to a log file in sequential order before being applied to the main data store.
+
+- During recovery, the system replays the log to restore the state.
+
+---
+class: center, middle
+
+**Example:** In PostgreSQL, every modification to a table is logged in the WAL, ensuring data recovery after a system failure.
+
+---
+class: center, middle
+
+### 3. Replicated Log
+
+---
+class: center, middle
+
+A **replicated log** is a sequence of log entries that are consistently replicated across multiple servers to maintain a coherent state among them.
+
+---
+
+#### Purpose of Replicated Logs
+
+- Ensure consistency across replicas in distributed systems.
+
+- Provide fault tolerance by allowing any surviving node to take over in case of failure.
+
+---
+
+#### How Replicated Logs Work
+
+- **Leader-Follower Model**: One server acts as the leader and appends log entries. Followers replicate these entries from the leader.
+
+- Consensus protocols like **Raft** or **Paxos** are often used to ensure agreement on the log entries.
+
+---
+class: center, middle
+
+**Example:** In Raft, a leader writes updates to its log, and these updates are sent to followers. Once a majority of followers acknowledge the update, it is committed.
+
+---
+class: center, middle
+
+### 4. Follower Reads
+
+---
+class: center, middle
+
+**Follower reads** refer to the process of reading data from follower replicas in a distributed system instead of from the leader.
+
+---
+class: center, middle
+
+This can help balance the read load and improve read performance, especially in systems with many replicas and high read demand.
+
+---
+class: center, middle
+
+**Example:** In a distributed database with a leader-follower architecture, a user query for a read-heavy operation might be routed to a follower replica to reduce latency and leader load.
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
