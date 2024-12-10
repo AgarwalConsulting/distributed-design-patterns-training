@@ -2387,7 +2387,7 @@ A centralized service (or orchestrator) coordinates and controls the interaction
 ---
 class: center, middle
 
-**Example**: A workflow engine like Camunda handles the sequence of operations for order fulfillment.
+**Example:** A workflow engine like Camunda handles the sequence of operations for order fulfillment.
 
 ---
 class: center, middle
@@ -2413,7 +2413,7 @@ Each service reacts to events and independently decides the next step, relying o
 ---
 class: center, middle
 
-**Example**: An "order placed" event triggers inventory and payment services to act independently.
+**Example:** An "order placed" event triggers inventory and payment services to act independently.
 
 ---
 class: center, middle
@@ -2609,7 +2609,7 @@ Acts as a translator or bridge.
 ---
 class: center, middle
 
-**Example**: A module that translates REST requests into SOAP for a legacy service.
+**Example:** A module that translates REST requests into SOAP for a legacy service.
 
 ---
 class: center, middle
@@ -3254,6 +3254,350 @@ producer.Produce(&kafka.Message{
 msg, _ := consumer.ReadMessage(-1)
 fmt.Println("Pipe endpoint received:", string(msg.Value))
 ```
+
+---
+class: center, middle
+
+## Replication Patterns for Scalable Distributed Systems
+
+---
+class: center, middle
+
+### 1. Replicated Load-Balanced Services
+
+---
+class: center, middle
+
+multiple instances (replicas) of a service run in parallel to handle requests
+
+---
+class: center, middle
+
+A load balancer sits in front of these replicas to distribute incoming traffic across them.
+
+---
+
+#### Key Benefits of Replicated Load-Balanced Services
+
+- **Fault Tolerance:** If one replica fails, others can continue serving traffic.
+
+- **Scalability:** Traffic is distributed, enabling higher throughput.
+
+- **Performance:** Reduced response time due to workload sharing.
+
+---
+
+#### How Replicated Load-Balanced Services Work
+
+- A load balancer uses algorithms like round-robin, least connections, or resource-based decisions to route requests.
+
+- The service replicas are stateless or maintain minimal state to ensure consistency.
+
+---
+
+#### Challenges of Replicated Load-Balanced Services
+
+- **Session Stickiness:** In stateful systems, managing user sessions can be challenging without a mechanism like sticky sessions or distributed caching.
+
+- **Health Checks:** Load balancers must monitor the health of replicas to avoid routing traffic to unhealthy instances.
+
+---
+class: center, middle
+
+### 2. Sharded Services
+
+---
+class: center, middle
+
+Sharding involves splitting a dataset or workload into smaller, manageable pieces (shards), each handled by a separate service or database instance.
+
+---
+class: center, middle
+
+Sharding is typically based on a key (e.g., user ID) using a hashing function or range-based partitioning.
+
+---
+
+#### Key Benefits of Sharding
+
+- **Scalability:** Each shard handles a subset of data, enabling horizontal scaling.
+
+- **Efficiency:** Queries are directed only to relevant shards, improving performance.
+
+- **Fault Isolation:** Issues in one shard don't affect others.
+
+---
+
+#### How Sharding Works
+
+- Data is partitioned using techniques like consistent hashing or range-based partitioning.
+
+- Each shard is often an independent service or database.
+
+---
+
+#### Challenges of Sharded Services
+
+- **Cross-Shard Queries:** Queries involving multiple shards require additional coordination.
+
+- **Rebalancing Shards:** If the data distribution becomes uneven (e.g., one shard grows too large), rebalancing can be complex.
+
+---
+class: center, middle
+
+**Example:** A social media app might shard users based on user IDs to ensure no single database becomes a bottleneck.
+
+---
+class: center, middle
+
+### 3. Master-Worker
+
+---
+class: center, middle
+
+consists of a **master node** that delegates tasks to **worker nodes** and coordinates their execution
+
+---
+
+#### Key Benefits of Master-Worker
+
+- **Parallel Processing:** Tasks are executed concurrently by workers.
+
+- **Simplified Coordination:** The master ensures efficient distribution and orchestration.
+
+- **Dynamic Scaling:** Adding more workers increases throughput without redesigning the system.
+
+---
+
+#### How Master-Worker Works
+
+- The master breaks tasks into smaller units and assigns them to workers.
+
+- Workers process tasks and report back to the master with results or status updates.
+
+---
+
+#### Challenges of Master-Worker
+
+- **Task Distribution:** Ensuring tasks are evenly distributed.
+
+- **Worker Failures:** Handling situations where workers fail mid-task.
+
+---
+class: center, middle
+
+**Example:** A video processing service where the master distributes video encoding tasks to multiple worker nodes.
+
+---
+class: center, middle
+
+### 4. Consistent Core
+
+---
+class: center, middle
+
+A core subset of the system (e.g., a metadata service or transaction log) is kept strongly consistent.
+
+---
+class: center, middle
+
+The "consistent core" pattern ensures strong consistency within a core subset of the system while allowing eventual consistency in other parts.
+
+---
+
+#### Key Benefits of Consistent Core
+
+- **Strong Guarantees for Critical Data:** Data in the core remains consistent and reliable.
+
+- **Performance Gains Elsewhere:** Non-critical components can prioritize availability and partition tolerance.
+
+---
+
+#### How Consistent Core Works
+
+- Critical components of the system use protocols like Paxos or Raft to maintain consistency.
+
+- Non-core components may use asynchronous updates or eventual consistency mechanisms.
+
+---
+
+#### Challenges of Consistent Core
+
+- **Boundary Management:** Deciding which data resides in the consistent core versus the eventually consistent regions.
+
+- **Increased Complexity:** Requires additional logic to synchronize the two parts.
+
+---
+class: center, middle
+
+**Example:** A shopping cart service where inventory levels (consistent core) are strongly consistent but user cart updates (eventually consistent) prioritize availability.
+
+---
+class: center, middle
+
+### 5. Master Election
+
+---
+class: center, middle
+
+Master election is the process of selecting a "leader" or "primary" node from a group of nodes in a distributed system.
+
+---
+class: center, middle
+
+If the master fails, the system elects a new one.
+
+---
+
+#### Key Benefits of Master Election
+
+- **Single Point of Coordination:** Ensures there is one authoritative decision-maker.
+
+- **Fault Tolerance:** If the master fails, a new one is elected automatically.
+
+---
+
+#### How Master Election Works
+
+- Algorithms like Paxos, Raft, or Zookeeper’s leader election mechanism are used.
+
+- Nodes compete for the role of master, often based on criteria like unique IDs or timestamps.
+
+---
+
+#### Challenges with Master Election
+
+- **Split-Brain Scenarios:** Two nodes may believe they are the leader simultaneously.
+
+- **Election Delays:** Can cause downtime during failovers.
+
+---
+class: center, middle
+
+**Example:** A distributed database like etcd or Zookeeper uses master election to determine which node is responsible for handling writes.
+
+---
+class: center, middle
+
+### 6. Leaders and Followers
+
+---
+class: center, middle
+
+In this model, a **leader** node handles updates or writes, and **followers** replicate the data and often handle read requests.
+
+---
+class: center, middle
+
+Read requests can be handled by either the leader or the followers.
+
+---
+
+#### Key Benefits of Leader-Follower
+
+- **Efficient Writes:** Centralized writes simplify consistency management.
+
+- **Load Balancing:** Followers offload read traffic from the leader.
+
+- **Data Replication:** Followers maintain up-to-date copies of data.
+
+---
+
+#### How Leader-Follower Works
+
+- Followers replicate the leader's state through mechanisms like log replication.
+
+- If the leader fails, a new leader is elected.
+
+---
+
+#### Challenges of Leader-Follower
+
+- **Replication Lag:** Followers may have slightly outdated data.
+
+- **Leader Failures:** Require leader election or failover mechanisms.
+
+---
+class: center, middle
+
+**Example:** Relational databases like MySQL can operate in leader-follower mode to scale read operations.
+
+---
+class: center, middle
+
+### 7. Scatter and Gather
+
+---
+class: center, middle
+
+A query is split (scatter) and sent to multiple nodes for processing.
+
+---
+class: center, middle
+
+Each node processes its part and returns a result, which is aggregated (gathered) to form the final response.
+
+---
+
+#### Key Benefits of Scatter and Gather
+
+- **Parallel Processing:** Sub-queries are processed concurrently, reducing response time.
+
+- **Scalability:** Each node handles only a subset of the workload.
+
+---
+
+#### How Scatter and Gather Works
+
+- A query coordinator splits the workload and sends it to distributed nodes.
+
+- Nodes process their parts and return results to the coordinator for aggregation.
+
+---
+
+#### Challenges of Scatter and Gather
+
+- **Result Aggregation:** Combining partial results can be complex for certain query types.
+
+- **Slow Nodes:** A single slow node can delay the entire operation.
+
+---
+class: center, middle
+
+**Example:** A search engine where queries are distributed to multiple index servers, and their results are combined for the user.
+
+---
+class: center, middle
+
+### 8. Follower Reads
+
+---
+class: center, middle
+
+Read requests are directed to follower nodes instead of the leader to reduce load on the leader and improve latency.
+
+---
+
+#### Key Benefits of Follower Reads
+
+- **Reduced Leader Load:** Read traffic is offloaded to followers.
+
+- **Improved Scalability:** Followers handle a significant portion of the traffic.
+
+- **Lower Latency:** Reads can be served from geographically closer followers.
+
+---
+
+#### Challenges of Follower Reads
+
+- **Stale Reads:** Followers may have slightly outdated data due to replication lag.
+
+- **Consistency Trade-offs:** Suitable only for applications tolerating eventual consistency.
+
+---
+class: center, middle
+
+**Example:** In a distributed database, follower nodes handle analytics queries while the leader handles transactional updates.
 
 ---
 class: center, middle
