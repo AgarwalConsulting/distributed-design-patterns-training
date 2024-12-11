@@ -837,7 +837,7 @@ class: center, middle
 ---
 class: center, middle
 
-Every TCP new TCP connection requires a new handshake!
+Every new TCP connection requires a new handshake!
 
 ---
 class: center, middle
