@@ -3752,6 +3752,316 @@ class: center, middle
 ---
 class: center, middle
 
+## Consensus Protocols
+
+---
+class: center, middle
+
+Paxos and Raft are distributed consensus algorithms.
+
+---
+class: center, middle
+
+They are used to ensure a group of distributed systems (nodes) agree on a single value even in the presence of failures (e.g., node crashes or network partitions).
+
+---
+class: center, middle
+
+### 1. Paxos
+
+.caveat[Came out in 1989]
+.content-credits[https://lamport.azurewebsites.net/pubs/paxos-simple.pdf]
+
+---
+class: center, middle
+
+Paxos is one of the first and most influential consensus algorithms.
+
+---
+class: center, middle
+
+It forms the theoretical foundation for many distributed systems.
+
+---
+class: center, middle
+
+It tolerates failures but ensures safety (never wrong results) as long as a majority of nodes are operational.
+
+---
+
+#### Key Components of Paxos
+
+1. **Proposers**: Suggest values to be agreed upon.
+
+2. **Acceptors**: Decide which value to accept. A majority of acceptors must agree on a single value for consensus.
+
+3. **Learners**: Learn the chosen value after consensus is reached.
+
+---
+
+#### Phases of Paxos
+
+`1.` **Prepare Phase**
+
+- A proposer sends a "prepare request" with a proposal number (higher than any seen so far) to a majority of acceptors.
+
+- Acceptors respond with the highest proposal number they’ve accepted and any associated value.
+
+`2.` **Accept Phase**
+
+- If a proposer receives responses from a majority of acceptors, it sends an "accept request" with the value from the highest-numbered proposal or a new value.
+
+- Acceptors then decide whether to accept this proposal based on its number.
+
+`3.` **Learn Phase**
+
+- Once a value is accepted by a majority, it is considered chosen.
+
+- The result is communicated to learners.
+
+---
+
+#### Challenges with Paxos
+
+- **Complexity**: Paxos is theoretically sound but difficult to implement due to its intricate protocols.
+
+- **Single-decree focus**: The original Paxos handles only one consensus decision at a time, making it inefficient for practical systems.
+
+---
+class: center, middle
+
+### **1.1 Multi-Paxos**
+
+---
+class: center, middle
+
+The basic Paxos protocol handles a single consensus decision at a time.
+
+---
+class: center, middle
+
+To make it practical for distributed systems, **Multi-Paxos** extends Paxos to agree on a sequence of values (like log entries in Raft).
+
+---
+
+#### Key Differences in Multi-Paxos
+
+- **Leadership Optimization**: Multi-Paxos introduces a "leader" to handle most proposals, reducing overhead by skipping the "prepare phase" for each new proposal.
+
+- **Use Case**: Multi-Paxos is used in systems where ordering multiple operations is essential, such as in replicated state machines.
+
+---
+
+#### Challenges with Multi/Paxos
+
+- Implementation Complexity
+
+  - Requires careful handling of corner cases like split votes and network partitions.
+
+  - Lacks a clear separation of concerns (e.g., leader election isn't explicitly part of the core algorithm).
+
+- Performance
+
+  - Paxos requires **two phases** (prepare and accept) for each decision, leading to higher latency.
+
+  - Without optimizations, Paxos incurs significant communication overhead.
+
+- Fault Tolerance
+
+  - Safety is guaranteed (no two values are simultaneously committed) as long as a majority of acceptors are available.
+
+  - Liveness (progress) is not guaranteed if failures or network delays persist indefinitely.
+
+---
+
+#### Practical Implementations of Paxos
+
+- Used in theoretical research and systems requiring custom consensus implementations.
+
+- Systems: Google Chubby (uses a Paxos variant).
+
+---
+class: center, middle
+
+### 2. Raft
+
+.caveat[Came out in 2014]
+.content-credits[https://raft.github.io/raft.pdf]
+
+---
+class: center, middle
+
+Raft was designed to be a simpler, more understandable consensus algorithm, addressing the complexity of Paxos.
+
+---
+class: center, middle
+
+It is widely used in modern distributed systems (e.g., etcd, Consul).
+
+---
+class: center, middle
+
+Raft achieves consensus by maintaining a replicated log, ensuring all nodes (or replicas) agree on the same sequence of operations.
+
+.content-credits[https://raft.github.io/]
+
+---
+
+#### Key Components of Raft
+
+1. **Leader**: A single node responsible for managing the log and coordinating updates.
+
+2. **Followers**: Nodes that replicate the leader's log and respond to its requests.
+
+3. **Candidates**: Nodes that may attempt to become the leader during an election.
+
+---
+
+#### Phases of Raft
+
+`1.` Leader Election
+
+- Nodes start as followers.
+
+- A follower becomes a candidate if it doesn’t hear from a leader within a specified time (heartbeat timeout).
+
+- The candidate requests votes from other nodes. If it receives a majority, it becomes the leader.
+
+`2.` Log Replication
+
+- The leader appends commands to its log and sends them to followers.
+
+- Followers replicate the entries and acknowledge back to the leader.
+
+- Once the leader has a majority of acknowledgments, it commits the entries.
+
+.caveat[(1/2)]
+
+---
+
+`3.` Commit and Apply
+
+- The leader informs followers to apply committed entries to their state machines.
+
+- Followers also update their state machines for committed entries.
+
+.caveat[(2/2)]
+
+---
+class: center, middle
+
+#### Deep Dive into Raft
+
+.content-credits[https://thesecretlivesofdata.com/raft/]
+
+---
+
+##### Leadership in Raft
+
+Raft explicitly elects a leader to coordinate all activities:
+
+- **Election Timeout**: A random timer ensures nodes don't simultaneously start elections.
+
+- **Election Process**: Each node votes for one candidate; the first to receive a majority becomes the leader.
+
+- **Stale Leaders**: If a leader crashes, a new leader is elected. Only the leader with the latest term (a logical clock) can commit new entries.
+
+**Advantages**:
+
+- Reduces coordination complexity by funneling all requests through the leader.
+
+- Eliminates the overhead of repeated "prepare" phases seen in Paxos.
+
+---
+
+##### Log Replication
+
+Raft ensures that all nodes agree on the same sequence of operations:
+
+1. **Log Entries**:
+
+  - New commands are appended to the leader's log.
+
+  - The leader sends the entries to followers via **AppendEntries RPC**.
+
+2. **Commitment**:
+
+  - An entry is committed once it is replicated to a majority.
+
+  - Committed entries are applied to the state machines.
+
+---
+
+##### Failure Handling
+
+Raft handles various failure scenarios gracefully:
+
+- **Leader Failure**: Followers detect leader unavailability via heartbeat timeouts and trigger elections.
+
+- **Network Partition**: The side with a majority continues processing; the minority becomes unavailable until the network is restored.
+
+- **Log Divergence**: The leader ensures followers’ logs are consistent by overwriting conflicting entries.
+
+---
+
+#### Key Features of Raft
+
+- **Safety**: Raft ensures only one leader at a time, and only committed entries are applied to state machines.
+
+- **Understandability**: Raft divides its functionality into discrete, well-defined components (leader election, log replication, etc.).
+
+- **Efficiency**: Raft’s leader-based approach minimizes communication overhead compared to Paxos.
+
+---
+
+#### Practical Implementations of Raft
+
+- Widely used in distributed systems for real-world applications.
+
+- Systems: etcd, Consul, CockroachDB.
+
+---
+class: center, middle
+
+### Comparison of both the consensus protocols
+
+---
+
+| **Aspect**         | **Paxos**                             | **Raft**                              |
+|---------------------|---------------------------------------|---------------------------------------|
+| **Complexity**      | High, hard to implement              | Lower, designed for understandability |
+| **Focus**           | Theoretical model                    | Practical system design               |
+| **Leadership**      | No clear leadership in basic Paxos   | Leader-centric                        |
+| **Log Management**  | Not explicit in basic Paxos          | Built-in log replication              |
+| **Popularity**      | Foundational, academically significant| Widely adopted in practical systems   |
+| **Latency**               | Higher due to two phases per decision            | Lower due to streamlined leader-based approach |
+| **Communication**         | Requires multiple rounds of messages             | Minimal under stable conditions                |
+| **Fault Tolerance**       | Requires a majority, no built-in leader election | Handles leader failures explicitly             |
+
+---
+class: center, middle
+
+#### When Should You Choose Each?
+
+---
+
+##### Choose Paxos if
+
+- You need a highly theoretical foundation for consensus.
+
+- You're building a system where performance isn't the primary concern.
+
+---
+
+##### Choose Raft if
+
+- You want an easier-to-understand and implement leader-based consensus protocol.
+
+- You are building a production-grade distributed system with logs and replication.
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
