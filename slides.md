@@ -4132,6 +4132,8 @@ A single node can play multiple roles (e.g., a node can be both a proposer and a
 `5.` Node A collects acknowledgments from B and C (a majority).
 `6.` Node A broadcasts that \( v_1 \) is the chosen value.
 
+---
+
 ##### If a Conflict Occurs
 
 - If another proposer (Node B) tries to propose \( v_2 \) with \( n = 2 \), the acceptors will only consider it if \( n = 2 > 1 \).
