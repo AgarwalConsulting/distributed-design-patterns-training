@@ -1886,6 +1886,39 @@ It is often used in systems where changes to data are grouped into identifiable 
 ---
 class: center, middle
 
+### 10. Hybrid Clock
+
+---
+class: center, middle
+
+A **Hybrid Clock** combines the properties of logical clocks (like Lamport clocks) and physical clocks (real-time clocks).
+
+---
+class: center, middle
+
+It uses physical time for ordering when possible and falls back to logical increments when clocks are unsynchronized.
+
+---
+
+- **Physical and Logical Time**: Combines real-world timestamps with logical ordering.
+
+- **Causal Consistency**: Ensures events respect causality.
+
+- **Low Latency**: Provides event ordering with minimal delay.
+
+- **Clock Drift Tolerance**: Handles slight inconsistencies in physical clocks.
+
+---
+
+#### Use Cases of Hybrid Clock
+
+- Distributed systems requiring low-latency event ordering.
+
+- Systems that need both causal consistency and approximate real-time ordering.
+
+---
+class: center, middle
+
 ### Bonus: Vector Clock
 
 ---
@@ -1971,39 +2004,6 @@ class: center, middle
 - **Overhead**: Maintaining and transmitting vector clocks can add computational and communication overhead.
 
 - **Partial Order**: It provides only partial ordering; it doesn’t assign a single global timestamp.
-
----
-class: center, middle
-
-### 10. Hybrid Clock
-
----
-class: center, middle
-
-A **Hybrid Clock** combines the properties of logical clocks (like Lamport clocks) and physical clocks (real-time clocks).
-
----
-class: center, middle
-
-It uses physical time for ordering when possible and falls back to logical increments when clocks are unsynchronized.
-
----
-
-- **Physical and Logical Time**: Combines real-world timestamps with logical ordering.
-
-- **Causal Consistency**: Ensures events respect causality.
-
-- **Low Latency**: Provides event ordering with minimal delay.
-
-- **Clock Drift Tolerance**: Handles slight inconsistencies in physical clocks.
-
----
-
-#### Use Cases of Hybrid Clock
-
-- Distributed systems requiring low-latency event ordering.
-
-- Systems that need both causal consistency and approximate real-time ordering.
 
 ---
 class: center, middle
@@ -3878,7 +3878,33 @@ It tolerates failures but ensures safety (never wrong results) as long as a majo
 
 ---
 
-#### Key Components of Paxos
+#### The Fictional Parliament (1989)
+
+- Lamport's initial description of PAXOS was unique. He presented it as a protocol inspired by a fictional parliament on the Greek island of Paxos.
+
+- This parliament supposedly functioned even though its members frequently came and went ("peripatetic propensity"). Messages could be lost, and legislators might be forgetful.
+
+- By drawing this analogy, Lamport aimed to explain how consensus can be reached even in an unreliable environment with unreliable contributors.
+
+.content-credits[https://www.geeksforgeeks.org/paxos-consensus-algorithm/]
+
+---
+
+#### Roles in PAXOS
+
+PAXOS involves three distinct roles played by different nodes in the network:
+
+1. **Proposer**: A node that initiates the consensus process by proposing a value. This value could be anything from a new data entry to a configuration change.
+
+2. **Acceptor**: A node that participates in the consensus process by responding to proposals from proposers. Acceptors play a crucial role in validating proposals and ensuring agreement.
+
+3. **Learner** (Optional): A node that observes the consensus process and eventually learns the decided value. This role is not always explicitly defined in all variations of PAXOS. Learners can be any nodes in the system that need to be updated with the agreed-upon value.
+
+.content-credits[https://www.geeksforgeeks.org/paxos-consensus-algorithm/]
+
+---
+
+#### Roles (Simplified)
 
 1. **Proposers**: Suggest values to be agreed upon.
 
