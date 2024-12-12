@@ -1886,6 +1886,95 @@ It is often used in systems where changes to data are grouped into identifiable 
 ---
 class: center, middle
 
+### Bonus: Vector Clock
+
+---
+class: center, middle
+
+Vector clocks are a mechanism used in distributed systems to capture and represent the partial ordering of events, particularly in systems where there is no single global clock.
+
+---
+class: center, middle
+
+They help in determining the causal relationship between events (whether one event happened before another, they happened concurrently, or one is unrelated to the other).
+
+---
+class: center, middle
+
+#### How Vector Clocks Work
+
+---
+class: center, middle
+
+**Structure**: A vector clock is an array of integers, where each element corresponds to a process in the distributed system.
+
+**Example**: In a system with 3 processes \(P_1, P_2, P_3\), the vector clock might look like \([2, 1, 3]\).
+
+---
+class: center, middle
+
+**Initialization**: Each process starts with its vector clock initialized to zero, e.g., \([0, 0, 0]\).
+
+---
+
+##### Rules for Updating
+
+- **Internal Event**: When a process performs an internal operation, it increments its own entry in the vector clock.
+
+  **Example**: Process \(P_1\) executes an event, and its clock goes from \([0, 0, 0]\) to \([1, 0, 0]\).
+
+- **Send Event**: When a process sends a message, it attaches its current vector clock to the message.
+
+- **Receive Event**: When a process receives a message, it updates its vector clock by taking the element-wise maximum of its current clock and the clock received in the message. Then, it increments its own entry.
+
+---
+
+**Example**:
+
+- \(P_2\)'s clock: \([1, 2, 0]\)
+- \(P_2\) receives a message with clock: \([2, 1, 3]\)
+- \(P_2\) updates: \([\max(1,2), \max(2,1), \max(0,3)] = [2, 2, 3]\)
+- \(P_2\) increments its own entry: \([2, 3, 3]\).
+
+---
+
+#### Causal Relationships with Vector Clocks
+
+- **Happens-Before (\(\rightarrow\))**: An event \(E_1\) "happens before" \(E_2\) if and only if \(VC(E_1) < VC(E_2)\) (where "<" is element-wise comparison: all entries are less than or equal, and at least one is strictly less).
+
+- **Concurrent (\(||\))**: Two events \(E_1\) and \(E_2\) are concurrent if neither \(VC(E_1) < VC(E_2)\) nor \(VC(E_2) < VC(E_1)\).
+
+---
+
+#### Applications of Vector Clocks
+
+1. **Conflict Resolution**: In distributed databases (e.g., DynamoDB, Riak), vector clocks help resolve conflicts by determining causality between updates.
+
+2. **Event Ordering**: Systems use vector clocks to ensure events are processed in a causal order, even without global clocks.
+
+3. **Concurrency Detection**: Helps detect if two events are independent (concurrent) or one is causally dependent on another.
+
+4. **Debugging**: Useful in distributed system debugging and logging to track the sequence of events across processes.
+
+---
+
+#### Advantages
+
+- Precisely captures causal relationships.
+
+- Works efficiently in decentralized systems.
+
+#### Limitations
+
+- **Size**: The vector clock grows linearly with the number of processes, making it less scalable for large systems.
+
+- **Overhead**: Maintaining and transmitting vector clocks can add computational and communication overhead.
+
+- **Partial Order**: It provides only partial ordering; it doesn’t assign a single global timestamp.
+
+---
+class: center, middle
+
 ### 10. Hybrid Clock
 
 ---
