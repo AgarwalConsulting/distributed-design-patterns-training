@@ -4306,6 +4306,11 @@ class: center, middle
 ---
 class: center, middle
 
+## Kafka: A Deep Dive
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
