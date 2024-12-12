@@ -3691,7 +3691,7 @@ class: center, middle
 ---
 class: center, middle
 
-## Consistency Patterns for Sharded Systems
+## Consistency Patterns for Distributed Systems
 
 ---
 class: center, middle
@@ -3837,6 +3837,135 @@ This can help balance the read load and improve read performance, especially in 
 class: center, middle
 
 **Example:** In a distributed database with a leader-follower architecture, a user query for a read-heavy operation might be routed to a follower replica to reduce latency and leader load.
+
+---
+class: center, middle
+
+### Linearizability vs Serializability
+
+---
+class: center, middle
+
+**Linearizability** and **serializability** are both concepts in the context of concurrent systems, particularly in databases and distributed systems.
+
+---
+class: center, middle
+
+They are concerned with how operations on shared data are ordered to ensure consistency and correctness.
+
+---
+class: center, middle
+
+However, they are distinct in terms of their definitions and the guarantees they provide.
+
+---
+class: center, middle
+
+#### Linearizability
+
+---
+class: center, middle
+
+Linearizability is a consistency model often applied to concurrent data structures or systems that provides the strongest guarantee for the ordering of operations.
+
+---
+
+A system is linearizable if the results of all operations (such as reads and writes) can be ordered in such a way that:
+
+1. Each operation appears to take effect instantaneously at some point between its start and end times.
+
+2. The global order of these operations must respect the real-time order of events. If one operation happens before another, this order must be respected in the linearized order.
+
+---
+
+##### Key characteristics of Linearizability
+
+- **Real-time consistency**: Operations are ordered in a way that reflects their real-time execution.
+
+- **Atomicity**: Each operation is seen as a single, indivisible event.
+
+- **Global view**: There is a single, global order of operations that all processes observe, which helps to avoid ambiguity about the results of operations.
+
+---
+class: center, middle
+
+**Use cases**: Often used in systems requiring very high consistency, like real-time databases and distributed systems where operations need to be perceived as happening instantaneously at some point in time.
+
+---
+class: center, middle
+
+#### Serializability
+
+---
+class: center, middle
+
+Serializability is a concept mostly used in the context of database transactions, ensuring that the execution of transactions on a database is equivalent to some serial (non-concurrent) execution of those transactions.
+
+---
+
+A schedule of database transactions is serializable if it is equivalent to some serial schedule. In a serial schedule, transactions are executed one after the other, without overlapping.
+
+- The outcome of executing the transactions in a serial schedule is the same as executing the transactions concurrently, while ensuring no conflicts (like reading/writing the same data) violate the consistency of the database.
+
+---
+
+##### Key characteristics of Serializability
+
+- **Isolation**: Transactions are isolated from each other, ensuring that the effects of concurrent transactions do not interfere with each other.
+
+- **Conflict serializability**: The schedule is serializable if it can be transformed into a serial schedule by swapping non-conflicting transactions (transactions that don't write to the same data).
+
+- **Global order**: Serializability ensures that the final state of the database is the same as if the transactions had been executed one after the other.
+
+---
+class: center, middle
+
+**Use cases**: Typically used in relational database management systems (RDBMS) to ensure that transactions are consistent and do not result in incorrect data due to concurrency issues.
+
+---
+
+#### Key Differences between Linearizability & Serializability
+
+`1.` **Scope**
+
+- Linearizability applies to single operations or small sets of operations (e.g., on a distributed data structure).
+
+- Serializability applies to entire transactions or schedules of operations within databases.
+
+`2.` **Focus**
+
+- Linearizability ensures operations appear instantaneous and are ordered in real time.
+
+- Serializability ensures that transactions in a database, even when executed concurrently, do not produce results that would differ from a serial execution.
+
+.caveat[(1/2)]
+
+---
+
+`3.` **Real-time guarantees**
+
+- Linearizability imposes a real-time order, respecting the actual sequence of events in a system.
+
+- Serializability does not impose such real-time guarantees but ensures that the final result is as though transactions were executed sequentially.
+
+`4.` **Strength**
+
+- Linearizability is stronger because it requires a total order of operations, with a real-time perspective.
+
+- Serializability focuses on ensuring the consistency of the result, not necessarily the real-time order.
+
+.caveat[(2/2)]
+
+---
+class: center, middle
+
+In summary, **linearizability** is a stronger, real-time ordering guarantee for operations in concurrent systems, while **serializability** is a consistency model used in databases that ensures the correctness of concurrent transactions through an abstract serial ordering.
+
+---
+
+- **Linearizability** ensures that operations appear instantaneous, often used in distributed systems or data structures with real-time ordering.
+
+- **Serializability** ensures that a set of transactions in a database system behaves as if they were executed sequentially without interference, often ensuring that no conflicting updates break consistency.
 
 ---
 class: center, middle
