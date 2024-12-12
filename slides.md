@@ -3877,6 +3877,27 @@ A system is linearizable if the results of all operations (such as reads and wri
 2. The global order of these operations must respect the real-time order of events. If one operation happens before another, this order must be respected in the linearized order.
 
 ---
+class: center, middle
+
+##### Examples of Linearizability
+
+.content-credits[https://systemdesignschool.io/blog/linearizability-vs-serializability]
+
+---
+class: center, middle
+
+Say, for instance, you're working with a simple counter in a multi-threaded system. If two threads are incrementing the counter simultaneously, a linearizable system would ensure that, from the perspective of an observer (another thread or process), one increment happens strictly before the other, and the counter ends up with the correct value.
+
+.caveat[(1/2)]
+
+---
+class: center, middle
+
+let's take another example - consider a distributed data store that supports append operations. Two separate clients are appending to the same data store: one client appends 'A,' and the other 'B.' In a linearizable system, the data store will end up with either 'AB' or 'BA', but not something like 'AA' or 'BB'.
+
+.caveat[(2/2)]
+
+---
 
 ##### Key characteristics of Linearizability
 
@@ -3906,6 +3927,27 @@ Serializability is a concept mostly used in the context of database transactions
 A schedule of database transactions is serializable if it is equivalent to some serial schedule. In a serial schedule, transactions are executed one after the other, without overlapping.
 
 - The outcome of executing the transactions in a serial schedule is the same as executing the transactions concurrently, while ensuring no conflicts (like reading/writing the same data) violate the consistency of the database.
+
+---
+class: center, middle
+
+##### Examples of Serializability
+
+.content-credits[https://systemdesignschool.io/blog/linearizability-vs-serializability]
+
+---
+class: center, middle
+
+If we think about a banking system where you're trying to transfer money to a friend, several steps need to happen. The bank has to check your account, subtract the money, then add it to your friend's account. In a serializable system, those actions together form a transaction and will appear to happen all at once. Serializability guarantees that no other transaction (like someone else also transferring money at the same time) messes up this sequence of operations.
+
+.caveat[(1/2)]
+
+---
+class: center, middle
+
+As another example, let's consider an inventory management system. Here, a transaction would encompass checking if an item is available, decrementing the stock count after a sale, and confirming the order. Under serializability, these operations would appear as one single action, ensuring no mistakes (like selling more items than in stock) happen regardless of simultaneous transactions.
+
+.caveat[(2/2)]
 
 ---
 
