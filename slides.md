@@ -4042,6 +4042,11 @@ PAXOS involves three distinct roles played by different nodes in the network:
 3. **Learners**: Learn the chosen value after consensus is reached.
 
 ---
+class: center, middle
+
+A single node can play multiple roles (e.g., a node can be both a proposer and an acceptor).
+
+---
 
 #### Phases of Paxos
 
@@ -4062,6 +4067,76 @@ PAXOS involves three distinct roles played by different nodes in the network:
 - Once a value is accepted by a majority, it is considered chosen.
 
 - The result is communicated to learners.
+
+---
+
+#### Steps in Paxos
+
+`1.` **Prepare Phase**
+
+- The proposer sends a **Prepare Request** with a unique proposal number \( n \) to a majority of acceptors.
+
+- Each acceptor compares \( n \) with the highest-numbered proposal it has seen so far. If \( n \) is greater, the acceptor promises **not to accept proposals with numbers less than \( n \)** and replies with:
+
+  - The highest-numbered proposal it has previously accepted, if any.
+
+  - A confirmation of the promise.
+
+`2.` **Promise Responses**
+
+- The proposer collects responses from a majority of acceptors.
+
+- If any acceptor has already accepted a value \( v \), the proposer must adopt that value. If no acceptor has accepted a value, the proposer can propose its own value.
+
+.caveat[(1/2)]
+
+---
+
+`3.` **Propose Phase**
+
+- The proposer sends an **Accept Request** with \( n \) and the chosen value \( v \) (either its own value or the previously accepted value) to the same majority of acceptors.
+
+`4.` **Accept Responses**
+
+- If an acceptor receives an Accept Request for \( n \), and it has not promised to consider a higher-numbered proposal, it accepts \( v \) and acknowledges this to the proposer.
+
+`5.` **Learn Phase**
+
+- Once the proposer receives acknowledgments from a majority of acceptors, the value \( v \) is considered chosen.
+
+- The proposer broadcasts this decision to all nodes (including learners).
+
+.caveat[(2/2)]
+
+---
+
+#### Example Walkthrough of Paxos
+
+##### Initial State
+
+- Nodes: A, B, C
+- Proposer: Node A proposes \( v_1 \) with proposal number \( n = 1 \).
+
+##### Step 1: Prepare Phase
+
+`1.` Node A sends \( \text{Prepare}(n=1) \) to B and C.
+`2.` Nodes B and C reply with promises: "I will not accept proposals numbered less than 1." Neither has accepted a prior value.
+
+##### Step 2: Propose Phase
+
+`3.` Node A sends \( \text{Accept}(n=1, v_1) \) to B and C.
+`4.` B and C accept \( v_1 \) and reply.
+
+##### Step 3: Learn Phase
+
+`5.` Node A collects acknowledgments from B and C (a majority).
+`6.` Node A broadcasts that \( v_1 \) is the chosen value.
+
+##### If a Conflict Occurs
+
+- If another proposer (Node B) tries to propose \( v_2 \) with \( n = 2 \), the acceptors will only consider it if \( n = 2 > 1 \).
+
+- If \( v_1 \) was already accepted, Node B must propose \( v_1 \) instead of \( v_2 \).
 
 ---
 
