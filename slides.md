@@ -4430,6 +4430,13 @@ class: center, middle
 ---
 class: center, middle
 
+![Kafka Architecture](assets/images/kafka-architecture.png)
+
+.image-credits[https://blog.det.life/apache-kafka-overview-b04c4ab8ef49]
+
+---
+class: center, middle
+
 Code
 https://github.com/AgarwalConsulting/distributed-design-patterns-training
 
