@@ -14,11 +14,11 @@
   - Monoliths vs Modular vs Microservices vs Legacy
     - Database per service vs Shared Database
   - Client/Server
-    - SOA
+    - SOAP
     - ReST
     - gRPC
     - Messaging
-  - Distributed vs Cloud vs Serverless
+  - (On Prem) Distributed vs Cloud vs Serverless
     - Tradeoffs
       - Scalability
       - Resilience
@@ -49,6 +49,7 @@
   - Lamport Clock
   - Generation Clock
   - Hybrid Clock
+  - Vector Clock
   - Reactor
   - Proctor
 
@@ -71,6 +72,34 @@
   - Self Registration
   - Circuit Breaker
   - Adapter vs Sidecar vs Ambassador
+  - Scatter and Gather
+
+- Replication Patterns for Scalable Distributed Systems
+  - Replicated Load-Balanced Services
+  - Sharded Services
+  - Consistent Core
+  - Master-Worker
+  - Master Election
+  - Leaders and Followers
+  - Follower Reads
+
+## Day 3
+
+- Consistency Patterns for Sharded Systems
+  - Idempotent Consumer
+  - Write-Ahead Log
+  - Follower Reads
+  - Replicated Log
+  - Linearizability vs. Serializability
+
+- Consensus Protocols
+  - Paxos
+  - Raft
+  - Comparison of Consensus Protocols
+
+- Architecture Deep-dive
+  - Apache Kafka
+  - HDFS
 
 - Messaging Patterns across services
   - Point-to-Point
@@ -89,33 +118,3 @@
   - Translators
   - Pipes
   - Endpoints
-
-## Day 3
-
-- Replication Patterns for Scalable Distributed Systems
-  - Replicated Load-Balanced Services
-  - Sharded Services
-  - Master-Worker
-  - Consistent Core
-  - Master Election
-  - Leaders and Followers
-  - Scatter and Gather
-  - Follower Reads
-
-- Consistency Patterns for Sharded Systems
-  - Idempotent Consumer
-  - Write-Ahead Log
-  - Replicated Log
-  - Follower Reads
-
-- Consensus Protocols
-  - Paxos
-  - Raft
-  - Comparison of Consensus Protocols
-  - Linearizability vs. Serializability
-
-- Code & feature walkthrough of OSS projects
-  - MongoDB
-  - Apache Kafka
-  - NATS Server
-  - Hadoop Distributed File System

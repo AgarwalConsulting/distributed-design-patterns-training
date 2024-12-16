@@ -2800,549 +2800,46 @@ class: center, middle
 ---
 class: center, middle
 
-## Messaging Patterns across services
+### 9. Scatter and Gather
 
 ---
 class: center, middle
 
-### 1. Point-to-Point
+A query is split (scatter) and sent to multiple nodes for processing.
 
 ---
 class: center, middle
 
-A messaging pattern where a message is sent from one producer to one consumer.
+Each node processes its part and returns a result, which is aggregated (gathered) to form the final response.
 
 ---
-class: center, middle
-
-Messages are typically sent to a queue. Each message is consumed by a single consumer, ensuring one-to-one communication.
-
----
-class: center, middle
-
-**Use case**: Task distribution where only one worker should process a task.
-
----
-class: center, middle
-
-### 2. Publish/Subscribe
-
----
-class: center, middle
-
-A messaging pattern where messages are sent to multiple subscribers through a topic.
-
----
-class: center, middle
-
-Producers publish messages to a topic, and all subscribers to that topic receive the message.
-
----
-class: center, middle
-
-**Use case**: Broadcasting updates, e.g., sending notifications to multiple users.
-
----
-class: center, middle
-
-### 3. Message Bus
-
----
-class: center, middle
-
-An architecture where a central system (bus) manages message routing and transformation between different systems.
-
----
-class: center, middle
-
-Applications send messages to the bus, which routes them to the appropriate recipients, potentially transforming them en route.
-
----
-class: center, middle
-
-**Use case**: Large-scale system integration, ensuring decoupled communication between services.
-
----
-class: center, middle
-
-### 4. Command
-
----
-class: center, middle
-
-A message that instructs a system or service to perform a specific action.
-
----
-class: center, middle
-
-Typically represents a request with intent, often requiring acknowledgment or confirmation.
-
----
-class: center, middle
-
-**Use case**: Ordering a service to execute a function, such as creating a user in a system.
-
----
-
-#### Producer for Command Pattern
-
-```go
-// Command is embedded as message payload or headers.
-err = producer.Produce(&kafka.Message{
-  TopicPartition: kafka.TopicPartition{
-    Topic: &commandTopic,
-    Partition: kafka.PartitionAny,
-  },
-  Value:          []byte("CREATE_USER"),
-}, nil)
-```
-
----
-
-#### Consumer for Command Pattern
-
-```go
-msg, _ := consumer.ReadMessage(-1)
-// Interpret "CREATE_USER" as a command and perform corresponding logic.
-```
-
----
-class: center, middle
-
-### 5. Document
-
----
-class: center, middle
-
-A message that represents a data payload for exchange, often without specific intent.
-
----
-class: center, middle
-
-The focus is on transferring structured data (e.g., XML, JSON), which the receiver interprets.
-
----
-class: center, middle
-
-**Use case**: Sharing a purchase order or a report between systems.
-
----
-
-#### Producer for Document Pattern
-
-```go
-doc := `{"id": 1, "name": "Document Example"}`
-err = producer.Produce(&kafka.Message{
-  TopicPartition: kafka.TopicPartition{
-    Topic: &documentTopic,
-    Partition: kafka.PartitionAny,
-  },
-  Value:          []byte(doc),
-}, nil)
-```
-
----
-
-#### Consumer for Document Pattern
-
-```go
-msg, _ := consumer.ReadMessage(-1)
-fmt.Println("Document received:", string(msg.Value))
-```
-
----
-class: center, middle
-
-### 6. Event Notification
-
----
-class: center, middle
-
-A message that indicates something has occurred, often without expecting a response.
-
----
-class: center, middle
-
-The producer emits the event, and interested consumers react to it.
-
----
-class: center, middle
-
-**Use case**: Real-time notifications, such as "Order Placed" or "File Uploaded."
-
----
-
-#### Producer for Event Notification
-
-```go
-event := `{"eventType": "ORDER_PLACED", "orderId": 12345}`
-err = producer.Produce(&kafka.Message{
-  TopicPartition: kafka.TopicPartition{
-    Topic: &eventTopic,
-    Partition: kafka.PartitionAny,
-  },
-  Value: []byte(event),
-}, nil)
-```
-
----
-
-#### Consumer for Event Notification
-
-```go
-msg, _ := consumer.ReadMessage(-1)
-fmt.Println("Event received:", string(msg.Value))
-```
-
----
-class: center, middle
-
-### 7. Return Address
-
----
-class: center, middle
-
-A pattern where a message includes information about where to send the response.
-
----
-class: center, middle
-
-The producer embeds a return address (queue/topic) in the message for the consumer to send results back.
-
----
-class: center, middle
-
-**Use case**: Asynchronous request-response communication.
-
----
-
-#### Producer for Return Address (Requester)
-
-```go
-headers := []kafka.Header{{
-  Key: "ReturnAddress",
-  Value: []byte("response-topic"),
-}}
-
-err = producer.Produce(&kafka.Message{
-  TopicPartition: kafka.TopicPartition{
-    Topic: &requestTopic,
-    Partition: kafka.PartitionAny,
-  },
-  Value: []byte("Request payload"),
-  Headers: headers,
-}, nil)
-```
-
----
-
-#### Consumer for Return Address (Responder)
-
-```go
-for _, header := range msg.Headers {
-  if header.Key == "ReturnAddress" {
-    responseTopic := string(header.Value)
-    // Send response to this topic.
-  }
-}
-```
-
----
-class: center, middle
-
-### 8. Correlation
-
----
-class: center, middle
-
-A method to link related messages, often used in request-response patterns.
-
----
-class: center, middle
-
-Each message has a correlation ID that allows tracking its flow or associating it with a related request.
-
----
-class: center, middle
 
-Track messages using unique IDs (e.g., UUID).
+#### Key Benefits of Scatter and Gather
 
----
-class: center, middle
-
-**Use case**: Tracking order processing stages in a distributed system.
-
----
-
-#### Producer for Correlation Pattern
-
-```go
-correlationID := uuid.New().String()
-
-err = producer.Produce(&kafka.Message{
-  TopicPartition: kafka.TopicPartition{
-    Topic: &correlationTopic,
-    Partition: kafka.PartitionAny,
-  },
-  Value:          []byte("Message with correlation"),
-  Headers:        []kafka.Header{{
-    Key: "CorrelationID",
-    Value: []byte(correlationID),
-  }},
-}, nil)
-```
-
----
-
-#### Consumer for Correlation Pattern
-
-```go
-for _, header := range msg.Headers {
-  if header.Key == "CorrelationID" {
-    fmt.Println("CorrelationID:", string(header.Value))
-  }
-}
-```
-
----
-class: center, middle
-
-### 9. Message Sequence
-
----
-class: center, middle
-
-A series of related messages that must be processed in order.
-
----
-class: center, middle
-
-Messages are tagged with sequence information (e.g., sequence numbers) to maintain order.
-
----
-class: center, middle
-
-**Use case**: Streaming logs or data chunks.
-
----
-class: center, middle
-
-### 10. Channel Adapter
-
----
-class: center, middle
-
-A component that connects a messaging system to a non-messaging endpoint.
-
----
-class: center, middle
-
-It converts messages to the format needed by the target system (e.g., database or API) and vice versa.
-
----
-class: center, middle
-
-**Use case**: Integrating a legacy system with a modern messaging platform.
-
----
-class: center, middle
-
-### 11. Dead Letter Channel
-
----
-class: center, middle
-
-A special channel for messages that could not be processed or delivered successfully.
-
----
-class: center, middle
-
-When a message fails processing, it is moved to this channel for manual inspection or reprocessing.
-
----
-class: center, middle
-
-**Use case**: Handling errors in message delivery or processing.
-
----
-
-#### Consumer (Dead Letter Channel)
-
-```go
-if err != nil {
-  // Produce failed message to a Dead Letter Topic.
-  producer.Produce(&kafka.Message{
-    TopicPartition: kafka.TopicPartition{
-      Topic: &deadLetterTopic,
-      Partition: kafka.PartitionAny
-    },
-    Value:          msg.Value,
-  }, nil)
-}
-```
-
----
-class: center, middle
-
-### 12. Filters
-
----
-class: center, middle
-
-Components that selectively allow or block messages based on specific criteria.
-
----
-class: center, middle
+- **Parallel Processing:** Sub-queries are processed concurrently, reducing response time.
 
-Messages are inspected, and only those meeting certain conditions are forwarded.
+- **Scalability:** Each node handles only a subset of the workload.
 
 ---
-class: center, middle
-
-**Use case**: Filtering messages by priority or type.
-
----
-
-#### Consumer (Filtering)
-
-```go
-if string(msg.Value) == "important" {
-  fmt.Println("Filtered message:", string(msg.Value))
-}
-```
-
----
-class: center, middle
-
-### 13. Routers
-
----
-class: center, middle
-
-Components that direct messages to different channels based on specific rules.
-
----
-class: center, middle
-
-A router examines message content or metadata and routes it accordingly.
-
----
-class: center, middle
-
-**Use case**: Routing orders to regional warehouses based on customer location.
-
----
-
-#### Consumer (Routers)
-
-```go
-if string(msg.Value) == "TypeA" {
-  producer.Produce(&kafka.Message{
-    TopicPartition: kafka.TopicPartition{
-      Topic: &topicA,
-    },
-  }, nil)
-} else {
-  producer.Produce(&kafka.Message{
-    TopicPartition: kafka.TopicPartition{
-      Topic: &topicB,
-    },
-  }, nil)
-}
-```
-
----
-class: center, middle
-
-### 14. Translators
-
----
-class: center, middle
-
-Components that convert messages from one format or structure to another.
-
----
-class: center, middle
-
-Translators parse the incoming message and transform it into the desired format.
 
----
-class: center, middle
-
-**Use case**: Converting JSON messages to XML for a legacy system.
-
----
-class: center, middle
-
-```go
-msg := string(msg.Value)
-translated := strings.ToUpper(msg) // Example transformation.
-fmt.Println("Translated:", translated)
-```
-
----
-class: center, middle
-
-### 15. Pipes
-
----
-class: center, middle
-
-The connections between components in a messaging system.
-
----
-class: center, middle
-
-They transport messages from one point to another, often supporting additional features like buffering or filtering.
+#### How Scatter and Gather Works
 
----
-class: center, middle
-
-**Use case**: Connecting a producer to a consumer via a queue.
-
----
-class: center, middle
-
-### 16. Endpoints
-
----
-class: center, middle
+- A query coordinator splits the workload and sends it to distributed nodes.
 
-The entry or exit points in a messaging system.
+- Nodes process their parts and return results to the coordinator for aggregation.
 
 ---
-class: center, middle
 
-Producers and consumers interact with the messaging system through endpoints.
+#### Challenges of Scatter and Gather
 
----
-class: center, middle
+- **Result Aggregation:** Combining partial results can be complex for certain query types.
 
-**Use case**: A REST API acting as an endpoint for sending messages to a queue.
+- **Slow Nodes:** A single slow node can delay the entire operation.
 
 ---
 class: center, middle
-
-Use Kafka topics as **pipes**; services interact via **endpoints**.
-
----
-
-#### Producer (Pipes & Endpoints)
-
-```go
-producer.Produce(&kafka.Message{
-  TopicPartition: kafka.TopicPartition{
-    Topic: &pipeTopic,
-  },
-}, nil)
-```
-
-#### Consumer (Pipes & Endpoints)
 
-```go
-msg, _ := consumer.ReadMessage(-1)
-fmt.Println("Pipe endpoint received:", string(msg.Value))
-```
+**Example:** A search engine where queries are distributed to multiple index servers, and their results are combined for the user.
 
 ---
 class: center, middle
@@ -3439,48 +2936,7 @@ class: center, middle
 ---
 class: center, middle
 
-### 3. Master-Worker
-
----
-class: center, middle
-
-consists of a **master node** that delegates tasks to **worker nodes** and coordinates their execution
-
----
-
-#### Key Benefits of Master-Worker
-
-- **Parallel Processing:** Tasks are executed concurrently by workers.
-
-- **Simplified Coordination:** The master ensures efficient distribution and orchestration.
-
-- **Dynamic Scaling:** Adding more workers increases throughput without redesigning the system.
-
----
-
-#### How Master-Worker Works
-
-- The master breaks tasks into smaller units and assigns them to workers.
-
-- Workers process tasks and report back to the master with results or status updates.
-
----
-
-#### Challenges of Master-Worker
-
-- **Task Distribution:** Ensuring tasks are evenly distributed.
-
-- **Worker Failures:** Handling situations where workers fail mid-task.
-
----
-class: center, middle
-
-**Example:** A video processing service where the master distributes video encoding tasks to multiple worker nodes.
-
----
-class: center, middle
-
-### 4. Consistent Core
+### 3. Consistent Core
 
 ---
 class: center, middle
@@ -3520,6 +2976,47 @@ The "consistent core" pattern ensures strong consistency within a core subset of
 class: center, middle
 
 **Example:** A shopping cart service where inventory levels (consistent core) are strongly consistent but user cart updates (eventually consistent) prioritize availability.
+
+---
+class: center, middle
+
+### 4. Master-Worker
+
+---
+class: center, middle
+
+consists of a **master node** that delegates tasks to **worker nodes** and coordinates their execution
+
+---
+
+#### Key Benefits of Master-Worker
+
+- **Parallel Processing:** Tasks are executed concurrently by workers.
+
+- **Simplified Coordination:** The master ensures efficient distribution and orchestration.
+
+- **Dynamic Scaling:** Adding more workers increases throughput without redesigning the system.
+
+---
+
+#### How Master-Worker Works
+
+- The master breaks tasks into smaller units and assigns them to workers.
+
+- Workers process tasks and report back to the master with results or status updates.
+
+---
+
+#### Challenges of Master-Worker
+
+- **Task Distribution:** Ensuring tasks are evenly distributed.
+
+- **Worker Failures:** Handling situations where workers fail mid-task.
+
+---
+class: center, middle
+
+**Example:** A video processing service where the master distributes video encoding tasks to multiple worker nodes.
 
 ---
 class: center, middle
@@ -3614,51 +3111,7 @@ class: center, middle
 ---
 class: center, middle
 
-### 7. Scatter and Gather
-
----
-class: center, middle
-
-A query is split (scatter) and sent to multiple nodes for processing.
-
----
-class: center, middle
-
-Each node processes its part and returns a result, which is aggregated (gathered) to form the final response.
-
----
-
-#### Key Benefits of Scatter and Gather
-
-- **Parallel Processing:** Sub-queries are processed concurrently, reducing response time.
-
-- **Scalability:** Each node handles only a subset of the workload.
-
----
-
-#### How Scatter and Gather Works
-
-- A query coordinator splits the workload and sends it to distributed nodes.
-
-- Nodes process their parts and return results to the coordinator for aggregation.
-
----
-
-#### Challenges of Scatter and Gather
-
-- **Result Aggregation:** Combining partial results can be complex for certain query types.
-
-- **Slow Nodes:** A single slow node can delay the entire operation.
-
----
-class: center, middle
-
-**Example:** A search engine where queries are distributed to multiple index servers, and their results are combined for the user.
-
----
-class: center, middle
-
-### 8. Follower Reads
+### 7. Follower Reads
 
 ---
 class: center, middle
@@ -3790,7 +3243,27 @@ class: center, middle
 ---
 class: center, middle
 
-### 3. Replicated Log
+### 3. Follower Reads
+
+---
+class: center, middle
+
+**Follower reads** refer to the process of reading data from follower replicas in a distributed system instead of from the leader.
+
+---
+class: center, middle
+
+This can help balance the read load and improve read performance, especially in systems with many replicas and high read demand.
+
+---
+class: center, middle
+
+**Example:** In a distributed database with a leader-follower architecture, a user query for a read-heavy operation might be routed to a follower replica to reduce latency and leader load.
+
+---
+class: center, middle
+
+### 4. Replicated Log
 
 ---
 class: center, middle
@@ -3817,26 +3290,6 @@ A **replicated log** is a sequence of log entries that are consistently replicat
 class: center, middle
 
 **Example:** In Raft, a leader writes updates to its log, and these updates are sent to followers. Once a majority of followers acknowledge the update, it is committed.
-
----
-class: center, middle
-
-### 4. Follower Reads
-
----
-class: center, middle
-
-**Follower reads** refer to the process of reading data from follower replicas in a distributed system instead of from the leader.
-
----
-class: center, middle
-
-This can help balance the read load and improve read performance, especially in systems with many replicas and high read demand.
-
----
-class: center, middle
-
-**Example:** In a distributed database with a leader-follower architecture, a user query for a read-heavy operation might be routed to a follower replica to reduce latency and leader load.
 
 ---
 class: center, middle
@@ -4433,6 +3886,553 @@ class: center, middle
 ![Kafka Architecture](assets/images/kafka-architecture.png)
 
 .image-credits[https://blog.det.life/apache-kafka-overview-b04c4ab8ef49]
+
+---
+class: center, middle
+
+## Messaging Patterns across services
+
+---
+class: center, middle
+
+### 1. Point-to-Point
+
+---
+class: center, middle
+
+A messaging pattern where a message is sent from one producer to one consumer.
+
+---
+class: center, middle
+
+Messages are typically sent to a queue. Each message is consumed by a single consumer, ensuring one-to-one communication.
+
+---
+class: center, middle
+
+**Use case**: Task distribution where only one worker should process a task.
+
+---
+class: center, middle
+
+### 2. Publish/Subscribe
+
+---
+class: center, middle
+
+A messaging pattern where messages are sent to multiple subscribers through a topic.
+
+---
+class: center, middle
+
+Producers publish messages to a topic, and all subscribers to that topic receive the message.
+
+---
+class: center, middle
+
+**Use case**: Broadcasting updates, e.g., sending notifications to multiple users.
+
+---
+class: center, middle
+
+### 3. Message Bus
+
+---
+class: center, middle
+
+An architecture where a central system (bus) manages message routing and transformation between different systems.
+
+---
+class: center, middle
+
+Applications send messages to the bus, which routes them to the appropriate recipients, potentially transforming them en route.
+
+---
+class: center, middle
+
+**Use case**: Large-scale system integration, ensuring decoupled communication between services.
+
+---
+class: center, middle
+
+### 4. Command
+
+---
+class: center, middle
+
+A message that instructs a system or service to perform a specific action.
+
+---
+class: center, middle
+
+Typically represents a request with intent, often requiring acknowledgment or confirmation.
+
+---
+class: center, middle
+
+**Use case**: Ordering a service to execute a function, such as creating a user in a system.
+
+---
+
+#### Producer for Command Pattern
+
+```go
+// Command is embedded as message payload or headers.
+err = producer.Produce(&kafka.Message{
+  TopicPartition: kafka.TopicPartition{
+    Topic: &commandTopic,
+    Partition: kafka.PartitionAny,
+  },
+  Value:          []byte("CREATE_USER"),
+}, nil)
+```
+
+---
+
+#### Consumer for Command Pattern
+
+```go
+msg, _ := consumer.ReadMessage(-1)
+// Interpret "CREATE_USER" as a command and perform corresponding logic.
+```
+
+---
+class: center, middle
+
+### 5. Document
+
+---
+class: center, middle
+
+A message that represents a data payload for exchange, often without specific intent.
+
+---
+class: center, middle
+
+The focus is on transferring structured data (e.g., XML, JSON), which the receiver interprets.
+
+---
+class: center, middle
+
+**Use case**: Sharing a purchase order or a report between systems.
+
+---
+
+#### Producer for Document Pattern
+
+```go
+doc := `{"id": 1, "name": "Document Example"}`
+err = producer.Produce(&kafka.Message{
+  TopicPartition: kafka.TopicPartition{
+    Topic: &documentTopic,
+    Partition: kafka.PartitionAny,
+  },
+  Value:          []byte(doc),
+}, nil)
+```
+
+---
+
+#### Consumer for Document Pattern
+
+```go
+msg, _ := consumer.ReadMessage(-1)
+fmt.Println("Document received:", string(msg.Value))
+```
+
+---
+class: center, middle
+
+### 6. Event Notification
+
+---
+class: center, middle
+
+A message that indicates something has occurred, often without expecting a response.
+
+---
+class: center, middle
+
+The producer emits the event, and interested consumers react to it.
+
+---
+class: center, middle
+
+**Use case**: Real-time notifications, such as "Order Placed" or "File Uploaded."
+
+---
+
+#### Producer for Event Notification
+
+```go
+event := `{"eventType": "ORDER_PLACED", "orderId": 12345}`
+err = producer.Produce(&kafka.Message{
+  TopicPartition: kafka.TopicPartition{
+    Topic: &eventTopic,
+    Partition: kafka.PartitionAny,
+  },
+  Value: []byte(event),
+}, nil)
+```
+
+---
+
+#### Consumer for Event Notification
+
+```go
+msg, _ := consumer.ReadMessage(-1)
+fmt.Println("Event received:", string(msg.Value))
+```
+
+---
+class: center, middle
+
+### 7. Return Address
+
+---
+class: center, middle
+
+A pattern where a message includes information about where to send the response.
+
+---
+class: center, middle
+
+The producer embeds a return address (queue/topic) in the message for the consumer to send results back.
+
+---
+class: center, middle
+
+**Use case**: Asynchronous request-response communication.
+
+---
+
+#### Producer for Return Address (Requester)
+
+```go
+headers := []kafka.Header{{
+  Key: "ReturnAddress",
+  Value: []byte("response-topic"),
+}}
+
+err = producer.Produce(&kafka.Message{
+  TopicPartition: kafka.TopicPartition{
+    Topic: &requestTopic,
+    Partition: kafka.PartitionAny,
+  },
+  Value: []byte("Request payload"),
+  Headers: headers,
+}, nil)
+```
+
+---
+
+#### Consumer for Return Address (Responder)
+
+```go
+for _, header := range msg.Headers {
+  if header.Key == "ReturnAddress" {
+    responseTopic := string(header.Value)
+    // Send response to this topic.
+  }
+}
+```
+
+---
+class: center, middle
+
+### 8. Correlation
+
+---
+class: center, middle
+
+A method to link related messages, often used in request-response patterns.
+
+---
+class: center, middle
+
+Each message has a correlation ID that allows tracking its flow or associating it with a related request.
+
+---
+class: center, middle
+
+Track messages using unique IDs (e.g., UUID).
+
+---
+class: center, middle
+
+**Use case**: Tracking order processing stages in a distributed system.
+
+---
+
+#### Producer for Correlation Pattern
+
+```go
+correlationID := uuid.New().String()
+
+err = producer.Produce(&kafka.Message{
+  TopicPartition: kafka.TopicPartition{
+    Topic: &correlationTopic,
+    Partition: kafka.PartitionAny,
+  },
+  Value:          []byte("Message with correlation"),
+  Headers:        []kafka.Header{{
+    Key: "CorrelationID",
+    Value: []byte(correlationID),
+  }},
+}, nil)
+```
+
+---
+
+#### Consumer for Correlation Pattern
+
+```go
+for _, header := range msg.Headers {
+  if header.Key == "CorrelationID" {
+    fmt.Println("CorrelationID:", string(header.Value))
+  }
+}
+```
+
+---
+class: center, middle
+
+### 9. Message Sequence
+
+---
+class: center, middle
+
+A series of related messages that must be processed in order.
+
+---
+class: center, middle
+
+Messages are tagged with sequence information (e.g., sequence numbers) to maintain order.
+
+---
+class: center, middle
+
+**Use case**: Streaming logs or data chunks.
+
+---
+class: center, middle
+
+### 10. Channel Adapter
+
+---
+class: center, middle
+
+A component that connects a messaging system to a non-messaging endpoint.
+
+---
+class: center, middle
+
+It converts messages to the format needed by the target system (e.g., database or API) and vice versa.
+
+---
+class: center, middle
+
+**Use case**: Integrating a legacy system with a modern messaging platform.
+
+---
+class: center, middle
+
+### 11. Dead Letter Channel
+
+---
+class: center, middle
+
+A special channel for messages that could not be processed or delivered successfully.
+
+---
+class: center, middle
+
+When a message fails processing, it is moved to this channel for manual inspection or reprocessing.
+
+---
+class: center, middle
+
+**Use case**: Handling errors in message delivery or processing.
+
+---
+
+#### Consumer (Dead Letter Channel)
+
+```go
+if err != nil {
+  // Produce failed message to a Dead Letter Topic.
+  producer.Produce(&kafka.Message{
+    TopicPartition: kafka.TopicPartition{
+      Topic: &deadLetterTopic,
+      Partition: kafka.PartitionAny
+    },
+    Value:          msg.Value,
+  }, nil)
+}
+```
+
+---
+class: center, middle
+
+### 12. Filters
+
+---
+class: center, middle
+
+Components that selectively allow or block messages based on specific criteria.
+
+---
+class: center, middle
+
+Messages are inspected, and only those meeting certain conditions are forwarded.
+
+---
+class: center, middle
+
+**Use case**: Filtering messages by priority or type.
+
+---
+
+#### Consumer (Filtering)
+
+```go
+if string(msg.Value) == "important" {
+  fmt.Println("Filtered message:", string(msg.Value))
+}
+```
+
+---
+class: center, middle
+
+### 13. Routers
+
+---
+class: center, middle
+
+Components that direct messages to different channels based on specific rules.
+
+---
+class: center, middle
+
+A router examines message content or metadata and routes it accordingly.
+
+---
+class: center, middle
+
+**Use case**: Routing orders to regional warehouses based on customer location.
+
+---
+
+#### Consumer (Routers)
+
+```go
+if string(msg.Value) == "TypeA" {
+  producer.Produce(&kafka.Message{
+    TopicPartition: kafka.TopicPartition{
+      Topic: &topicA,
+    },
+  }, nil)
+} else {
+  producer.Produce(&kafka.Message{
+    TopicPartition: kafka.TopicPartition{
+      Topic: &topicB,
+    },
+  }, nil)
+}
+```
+
+---
+class: center, middle
+
+### 14. Translators
+
+---
+class: center, middle
+
+Components that convert messages from one format or structure to another.
+
+---
+class: center, middle
+
+Translators parse the incoming message and transform it into the desired format.
+
+---
+class: center, middle
+
+**Use case**: Converting JSON messages to XML for a legacy system.
+
+---
+class: center, middle
+
+```go
+msg := string(msg.Value)
+translated := strings.ToUpper(msg) // Example transformation.
+fmt.Println("Translated:", translated)
+```
+
+---
+class: center, middle
+
+### 15. Pipes
+
+---
+class: center, middle
+
+The connections between components in a messaging system.
+
+---
+class: center, middle
+
+They transport messages from one point to another, often supporting additional features like buffering or filtering.
+
+---
+class: center, middle
+
+**Use case**: Connecting a producer to a consumer via a queue.
+
+---
+class: center, middle
+
+### 16. Endpoints
+
+---
+class: center, middle
+
+The entry or exit points in a messaging system.
+
+---
+class: center, middle
+
+Producers and consumers interact with the messaging system through endpoints.
+
+---
+class: center, middle
+
+**Use case**: A REST API acting as an endpoint for sending messages to a queue.
+
+---
+class: center, middle
+
+Use Kafka topics as **pipes**; services interact via **endpoints**.
+
+---
+
+#### Producer (Pipes & Endpoints)
+
+```go
+producer.Produce(&kafka.Message{
+  TopicPartition: kafka.TopicPartition{
+    Topic: &pipeTopic,
+  },
+}, nil)
+```
+
+#### Consumer (Pipes & Endpoints)
+
+```go
+msg, _ := consumer.ReadMessage(-1)
+fmt.Println("Pipe endpoint received:", string(msg.Value))
+```
 
 ---
 class: center, middle
